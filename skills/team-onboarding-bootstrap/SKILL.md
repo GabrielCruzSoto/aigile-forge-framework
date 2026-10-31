@@ -7,7 +7,7 @@ description: "Interactive and non-interactive 6-dimension discovery workflow tha
 
 ## Purpose & Activation
 
-Activate when onboarding a new development team, bootstrapping a greenfield or brownfield project, or reconfiguring an existing workspace via `./aigile init` or `/init-team`. This skill adapts AIgile Forge Framework to any team topology, stack combination, tracker, and AI harness mode without hardcoded organizational assumptions.
+Activate when onboarding a new development team, bootstrapping a greenfield or brownfield project, or reconfiguring an existing workspace via `./aigile init` or `/init-team`. This skill adapts aigile-forge-framework to any team topology, stack combination, tracker, and AI harness mode without hardcoded organizational assumptions.
 
 ## Inputs
 

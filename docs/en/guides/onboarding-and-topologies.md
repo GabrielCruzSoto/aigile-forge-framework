@@ -4,7 +4,7 @@
 
 ## 1. Bootstrapping a Team Workspace (`./aigile init`)
 
-AFF supports both interactive wizard onboarding and deterministic non-interactive automation:
+aigile-forge-framework supports both interactive wizard onboarding and deterministic non-interactive automation:
 
 ```bash
 # Interactive wizard (English or Spanish)

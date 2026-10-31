@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Script: aff-harness.sh
-# Purpose: Universal deterministic harness projector for AIgile Forge Framework.
+# Purpose: Universal deterministic harness projector for aigile-forge-framework.
 #          Projects a single canonical source (aff.yaml, AGENTS.md, agents/,
 #          skills/, profiles/, prompts/, mcp/) across Claude Code, OpenCode,
 #          Google Antigravity, OpenAI Codex, and GitHub Copilot.
@@ -482,7 +482,7 @@ def sync_copilot() -> None:
             raw_slug = ameta.get("name") or afile.stem
             clean_slug = raw_slug[4:] if raw_slug.startswith("aff-") else raw_slug
             agent_id = f"aff-{clean_slug}"
-            desc = ameta.get("description") or f"AIgile Forge {clean_slug} specialist agent"
+            desc = ameta.get("description") or f"aigile-forge-framework {clean_slug} specialist agent"
             desc_escaped = desc.replace('"', '\\"')
             rendered_agent = (
                 "---\n"
@@ -583,7 +583,7 @@ if action == "sync_files":
 
 ## Claude Code Integration
 
-This entry point imports the canonical [`AGENTS.md`](AGENTS.md) contract shared across all AIgile Forge Framework harnesses.
+This entry point imports the canonical [`AGENTS.md`](AGENTS.md) contract shared across all aigile-forge-framework harnesses.
 
 - **Mode:** `{effective_mode}`
 - **Skills:** `.claude/skills/`
@@ -740,11 +740,11 @@ if action == "check":
         print(f"  [ERROR] {e}", file=sys.stderr)
 
     if errors:
-        print(f"==> [AFF Harness] Validation FAILED ({len(errors)} error(s)).", file=sys.stderr)
+        print(f"==> [aigile-forge-framework:harness] Validation FAILED ({len(errors)} error(s)).", file=sys.stderr)
         sys.exit(1)
 
     print(
-        f"==> [AFF Harness] Validation OK (mode={effective_mode}, "
+        f"==> [aigile-forge-framework:harness] Validation OK (mode={effective_mode}, "
         f"skills={len(skill_dirs)}, json_checked={len(json_candidates)})"
     )
     sys.exit(0)
@@ -754,7 +754,7 @@ PY
 case "$SUBCOMMAND" in
     sync)
         HARNESS_LIST="${HARNESS_ARG:-all}"
-        echo "==> [AFF Harness] Synchronizing harnesses (target_dir=$TARGET_DIR, link=$LINK_MODE, harnesses=$HARNESS_LIST)"
+        echo "==> [aigile-forge-framework:harness] Synchronizing harnesses (target_dir=$TARGET_DIR, link=$LINK_MODE, harnesses=$HARNESS_LIST)"
 
         # Project generated Markdown/JSON files first
         run_python_projector "sync_files"
@@ -773,7 +773,7 @@ case "$SUBCOMMAND" in
             sync_skills_dir ".github/skills"
         fi
 
-        echo "==> [AFF Harness] Synchronization completed."
+        echo "==> [aigile-forge-framework:harness] Synchronization completed."
         ;;
 
     check)
@@ -781,7 +781,7 @@ case "$SUBCOMMAND" in
         ;;
 
     status)
-        echo "==> [AFF Harness] Workspace Status ($TARGET_DIR)"
+        echo "==> [aigile-forge-framework:harness] Workspace Status ($TARGET_DIR)"
         echo ""
         echo "  Detected Harness CLIs:"
         for cli in claude opencode antigravity codex code; do
@@ -831,7 +831,7 @@ case "$SUBCOMMAND" in
         ;;
 
     clean)
-        echo "==> [AFF Harness] Cleaning generated harness projections in $TARGET_DIR..."
+        echo "==> [aigile-forge-framework:harness] Cleaning generated harness projections in $TARGET_DIR..."
         rm -f "$TARGET_DIR/CLAUDE.md" "$TARGET_DIR/.mcp.json" "$TARGET_DIR/opencode.json"
         rm -rf "$TARGET_DIR/.claude/skills" "$TARGET_DIR/.claude/agents"
         rm -rf "$TARGET_DIR/.agents/skills" "$TARGET_DIR/.agents/agents" "$TARGET_DIR/.agents/mcp_config.json"
@@ -839,7 +839,7 @@ case "$SUBCOMMAND" in
         rm -f "$TARGET_DIR/.github/copilot-instructions.md"
         rm -rf "$TARGET_DIR/.github/instructions" "$TARGET_DIR/.github/agents" "$TARGET_DIR/.github/prompts" "$TARGET_DIR/.github/skills"
         rmdir "$TARGET_DIR/.claude" "$TARGET_DIR/.agents" "$TARGET_DIR/.opencode" "$TARGET_DIR/.github" 2>/dev/null || true
-        echo "==> [AFF Harness] Clean completed."
+        echo "==> [aigile-forge-framework:harness] Clean completed."
         ;;
 
     help|-h|--help)

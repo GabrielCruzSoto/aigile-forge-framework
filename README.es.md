@@ -1,10 +1,10 @@
-# AIgile Forge Framework (`aigile-forge-framework`)
+# aigile-forge-framework
 
 > **English documentation:** [`README.md`](README.md) | **Portal de documentación:** [`docs/es/index.md`](docs/es/index.md)
 
-**AIgile Forge Framework (AFF)** es un marco universal y declarativo de ingeniería y gobierno asistido por IA para equipos de desarrollo de software. A partir de una única fuente canónica (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/` y `mcp/`), AFF proyecta de forma determinista instrucciones, agentes por rol, habilidades procedimentales (`skills`), perfiles tecnológicos y descriptores opcionales de MCP hacia **Claude Code**, **OpenCode**, **Google Antigravity**, **OpenAI Codex** y **GitHub Copilot**.
+**`aigile-forge-framework`** es un marco universal y declarativo de ingeniería y gobierno asistido por IA para equipos de desarrollo de software. A partir de una única fuente canónica (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/` y `mcp/`), aigile-forge-framework proyecta de forma determinista instrucciones, agentes por rol, habilidades procedimentales (`skills`), perfiles tecnológicos y descriptores opcionales de MCP hacia **Claude Code**, **OpenCode**, **Google Antigravity**, **OpenAI Codex** y **GitHub Copilot**.
 
-AFF se adapta a cualquier tamaño de equipo, pila tecnológica, topología de repositorios y herramienta de seguimiento de tickets sin acoplar el código fuente a ningún proveedor u organización específica.
+aigile-forge-framework se adapta a cualquier tamaño de equipo, pila tecnológica, topología de repositorios y herramienta de seguimiento de tickets sin acoplar el código fuente a ningún proveedor u organización específica.
 
 ---
 
@@ -95,7 +95,7 @@ flowchart TD
 
 ## Modos de Operación: Zero-MCP vs Full-MCP
 
-AFF ofrece dos modos controlados mediante `harnesses.mode` en `aff.yaml` o la opción `--mode` de la CLI:
+aigile-forge-framework ofrece dos modos controlados mediante `harnesses.mode` en `aff.yaml` o la opción `--mode` de la CLI:
 
 | Característica | Modo `zero-mcp` (Predeterminado) | Modo `mcp` (Conectado / Cortex-AI) |
 |---|---|---|

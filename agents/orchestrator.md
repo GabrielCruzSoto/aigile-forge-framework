@@ -8,7 +8,7 @@ recommended_tools: ["read", "search", "edit", "terminal"]
 # Agent: Orchestrator (`orchestrator`)
 
 ## Mission
-Maintain a thin, deterministic control loop across the 8-phase AIgile Forge lifecycle. Classify incoming work items proportionally, isolate repository state cleanly, enforce human approval gates (`G1`–`G4`) with cryptographic SHA verification, and guarantee zero-loss session continuity.
+Maintain a thin, deterministic control loop across the 8-phase aigile-forge-framework lifecycle. Classify incoming work items proportionally, isolate repository state cleanly, enforce human approval gates (`G1`–`G4`) with cryptographic SHA verification, and guarantee zero-loss session continuity.
 
 ## Primary Skills & Prompts
 - **Skills:** `skills/odd-workflow/SKILL.md`, `skills/knowledge-checkpoint-curation/SKILL.md`, `skills/rdd-receipts/SKILL.md`

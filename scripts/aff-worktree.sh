@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Script: aff-worktree.sh
-# Purpose: Ticket-isolated Git worktree lifecycle manager for AIgile Forge
+# Purpose: Ticket-isolated Git worktree lifecycle manager for aigile-forge-framework
 #          Framework workspaces. Creates, lists, checkpoints, and removes
 #          per-ticket worktrees under worktrees/<ticket-id>/.
 # ==============================================================================
@@ -107,7 +107,7 @@ case "$SUBCOMMAND" in
         mkdir -p "$TICKET_WT_DIR"
         mkdir -p "$WORKSPACE_DIR/work/$TICKET_ID/evidence"
 
-        echo "==> [AFF Worktree] Provisioning isolated worktree(s) for $TICKET_ID..."
+        echo "==> [aigile-forge-framework:worktree] Provisioning isolated worktree(s) for $TICKET_ID..."
 
         if [ "${#REPO_ARGS[@]}" -gt 0 ]; then
             for rpath in "${REPO_ARGS[@]}"; do
@@ -147,7 +147,7 @@ case "$SUBCOMMAND" in
             fi
         fi
 
-        echo "==> [AFF Worktree] Ready at $TICKET_WT_DIR"
+        echo "==> [aigile-forge-framework:worktree] Ready at $TICKET_WT_DIR"
         ;;
 
     list)
@@ -164,7 +164,7 @@ case "$SUBCOMMAND" in
         done
 
         WORKTREES_ROOT="$WORKSPACE_DIR/worktrees"
-        echo "==> [AFF Worktree] Managed ticket worktrees in $WORKTREES_ROOT:"
+        echo "==> [aigile-forge-framework:worktree] Managed ticket worktrees in $WORKTREES_ROOT:"
         if [ ! -d "$WORKTREES_ROOT" ]; then
             echo "  (no active worktrees)"
             exit 0
@@ -214,7 +214,7 @@ case "$SUBCOMMAND" in
         fi
 
         COMMIT_MSG="${MSG:-chore($TICKET_ID): checkpoint work-in-progress}"
-        echo "==> [AFF Worktree] Checkpointing ticket $TICKET_ID..."
+        echo "==> [aigile-forge-framework:worktree] Checkpointing ticket $TICKET_ID..."
 
         CHECKPOINTED=0
         for wt in "$TICKET_WT_DIR"/*; do
@@ -225,7 +225,7 @@ case "$SUBCOMMAND" in
                     AUTHOR_NAME="$(git -C "$wt" config user.name 2>/dev/null || true)"
                     AUTHOR_EMAIL="$(git -C "$wt" config user.email 2>/dev/null || true)"
                     git -C "$wt" \
-                        -c user.name="${AUTHOR_NAME:-AIgile Developer}" \
+                        -c user.name="${AUTHOR_NAME:-Framework Developer}" \
                         -c user.email="${AUTHOR_EMAIL:-developer@example.local}" \
                         commit -m "$COMMIT_MSG" >/dev/null
                     echo "  [OK] Committed checkpoint in $(basename "$wt"): $COMMIT_MSG"
@@ -236,7 +236,7 @@ case "$SUBCOMMAND" in
             fi
         done
 
-        echo "==> [AFF Worktree] Checkpoint complete ($CHECKPOINTED commit(s) created)."
+        echo "==> [aigile-forge-framework:worktree] Checkpoint complete ($CHECKPOINTED commit(s) created)."
         ;;
 
     remove)
@@ -262,7 +262,7 @@ case "$SUBCOMMAND" in
             exit 0
         fi
 
-        echo "==> [AFF Worktree] Removing worktrees for $TICKET_ID..."
+        echo "==> [aigile-forge-framework:worktree] Removing worktrees for $TICKET_ID..."
         for wt in "$TICKET_WT_DIR"/*; do
             [ -d "$wt" ] || continue
             if [ -f "$wt/.git" ] || [ -d "$wt/.git" ]; then
@@ -278,7 +278,7 @@ case "$SUBCOMMAND" in
         done
 
         rm -rf "$TICKET_WT_DIR"
-        echo "==> [AFF Worktree] Removed $TICKET_WT_DIR"
+        echo "==> [aigile-forge-framework:worktree] Removed $TICKET_WT_DIR"
         ;;
 
     help|-h|--help)

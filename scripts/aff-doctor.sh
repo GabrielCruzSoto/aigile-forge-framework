@@ -2,7 +2,7 @@
 # ==============================================================================
 # Script: aff-doctor.sh
 # Purpose: Read-only environment and workspace health diagnostic tool for
-#          AIgile Forge Framework. Verifies OS, bash, git, python3/jq, aff.yaml,
+#          aigile-forge-framework. Verifies OS, bash, git, python3/jq, aff.yaml,
 #          active harness mode (zero-mcp vs mcp), and git pre-commit hook state.
 # ==============================================================================
 
@@ -84,7 +84,7 @@ WARNINGS=0
 OS_LABEL="$(detect_os)"
 
 echo "======================================================================"
-echo "  AIgile Forge Framework — Environment & Workspace Doctor"
+echo "  aigile-forge-framework — Environment & Workspace Doctor"
 echo "======================================================================"
 echo "  Target Workspace: $TARGET_DIR"
 echo "  Operating System: $OS_LABEL"
@@ -213,13 +213,13 @@ done
 echo ""
 echo "======================================================================"
 if [ "$ERRORS" -gt 0 ]; then
-    echo "  [AFF Doctor] UNHEALTHY: $ERRORS critical issue(s), $WARNINGS warning(s)." >&2
+    echo "  [aigile-forge-framework:doctor] UNHEALTHY: $ERRORS critical issue(s), $WARNINGS warning(s)." >&2
     echo "  Action: Install missing prerequisites or run './aigile init'." >&2
     echo "======================================================================"
     exit 1
 fi
 
-echo "  [AFF Doctor] HEALTHY BASELINE ($WARNINGS advisory warning(s), mode=$ACTIVE_MODE)."
+echo "  [aigile-forge-framework:doctor] HEALTHY BASELINE ($WARNINGS advisory warning(s), mode=$ACTIVE_MODE)."
 echo "  Next actions:"
 echo "    - Project harnesses: ./aigile harness sync all"
 echo "    - Validate schemas:  ./aigile harness check"

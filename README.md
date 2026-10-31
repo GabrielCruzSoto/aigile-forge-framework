@@ -1,10 +1,10 @@
-# AIgile Forge Framework (`aigile-forge-framework`)
+# aigile-forge-framework
 
 > **Spanish documentation:** [`README.es.md`](README.es.md) | **Documentation Portal:** [`docs/en/index.md`](docs/en/index.md)
 
-**AIgile Forge Framework (AFF)** is a universal, declarative engineering harness and governance framework for software development teams. From a single canonical source (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/`, and `mcp/`), AFF deterministically projects instructions, specialist role agents, procedural skills, stack guardrails, and optional MCP descriptors across **Claude Code**, **OpenCode**, **Google Antigravity**, **OpenAI Codex**, and **GitHub Copilot**.
+**`aigile-forge-framework`** is a universal, declarative engineering harness and governance framework for software development teams. From a single canonical source (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/`, and `mcp/`), aigile-forge-framework deterministically projects instructions, specialist role agents, procedural skills, stack guardrails, and optional MCP descriptors across **Claude Code**, **OpenCode**, **Google Antigravity**, **OpenAI Codex**, and **GitHub Copilot**.
 
-AFF adapts to any team size, technology stack, repository topology, and issue tracker without coupling your codebase to a specific AI vendor or organization.
+aigile-forge-framework adapts to any team size, technology stack, repository topology, and issue tracker without coupling your codebase to a specific AI vendor or organization.
 
 ---
 
@@ -94,7 +94,7 @@ flowchart TD
 
 ## Zero-MCP vs Full-MCP Modes
 
-AFF supports two operational modes controlled by `harnesses.mode` in `aff.yaml` or `--mode` on the CLI:
+aigile-forge-framework supports two operational modes controlled by `harnesses.mode` in `aff.yaml` or `--mode` on the CLI:
 
 | Capability | `zero-mcp` Mode (Default) | `mcp` Mode (Connected / Cortex-AI) |
 |---|---|---|

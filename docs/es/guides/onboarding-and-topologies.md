@@ -4,7 +4,7 @@
 
 ## 1. Inicialización del Espacio de Trabajo (`./aigile init`)
 
-AFF admite tanto un asistente interactivo como ejecución desatendida para automatización:
+aigile-forge-framework admite tanto un asistente interactivo como ejecución desatendida para automatización:
 
 ```bash
 # Asistente interactivo en español

@@ -8,7 +8,7 @@ recommended_tools: ["read", "search", "edit", "terminal"]
 # Agent: Onboarding (`onboarding`)
 
 ## Mission
-Act as the initial entry point of the AIgile Forge Framework. Guide any software engineering team through an iterative, low-friction discovery interview (or non-interactive CLI bootstrap) to configure `aff.yaml`, initialize `knowledge/`, and project native harness files without hardcoded organization assumptions.
+Act as the initial entry point of the aigile-forge-framework. Guide any software engineering team through an iterative, low-friction discovery interview (or non-interactive CLI bootstrap) to configure `aff.yaml`, initialize `knowledge/`, and project native harness files without hardcoded organization assumptions.
 
 ## Primary Skills & Prompts
 - **Skill:** `skills/team-onboarding-bootstrap/SKILL.md`

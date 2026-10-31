@@ -1,6 +1,6 @@
-# AGENTS.md — AIgile Forge Framework (Universal Operational Contract)
+# AGENTS.md — aigile-forge-framework (Universal Operational Contract)
 
-> Canonical operational contract, architecture specification, and catalog index for the **AIgile Forge Framework (`aigile-forge-framework`)**.
+> Canonical operational contract, architecture specification, and catalog index for the **`aigile-forge-framework`**.
 > Natively compatible with **Claude Code**, **OpenCode**, **Google Antigravity**, **OpenAI Codex**, and **GitHub Copilot** through a single declarative source of truth (`aff.yaml` + `AGENTS.md`).
 > Strictly agnostic to any specific company, vendor, industry domain, or team structure.
 
@@ -8,7 +8,7 @@
 
 ## 1. Universal Architecture & Operating Modes
 
-AIgile Forge Framework unifies CLI/agentic harnesses and IDE-native assistants around one canonical repository tree (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/`, `mcp/`, `configs/`). Deterministic projection via `./aigile harness sync` (backed by `scripts/aff-harness.sh`) materializes native configuration paths without manual duplication:
+aigile-forge-framework unifies CLI/agentic harnesses and IDE-native assistants around one canonical repository tree (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/`, `mcp/`, `configs/`). Deterministic projection via `./aigile harness sync` (backed by `scripts/aff-harness.sh`) materializes native configuration paths without manual duplication:
 
 | Harness | Projected Instructions | Projected Agents & Prompts | Projected Skills | MCP Descriptor (`mcp` mode) |
 |---|---|---|---|---|

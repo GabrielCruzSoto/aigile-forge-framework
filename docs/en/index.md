@@ -1,8 +1,8 @@
-# AIgile Forge Framework — Documentation Portal
+# aigile-forge-framework — Documentation Portal
 
 > **Idioma / Language:** English | [Español (`docs/es/index.md`)](../es/index.md)
 
-Welcome to the **AIgile Forge Framework (AFF)** documentation portal. AFF unifies multi-harness CLI/IDE engineering (`Claude Code`, `OpenCode`, `Google Antigravity`, `OpenAI Codex`) and declarative IDE governance (`GitHub Copilot`) under a single canonical contract.
+Welcome to the **`aigile-forge-framework`** documentation portal. aigile-forge-framework unifies multi-harness CLI/IDE engineering (`Claude Code`, `OpenCode`, `Google Antigravity`, `OpenAI Codex`) and declarative IDE governance (`GitHub Copilot`) under a single canonical contract.
 
 ---
 

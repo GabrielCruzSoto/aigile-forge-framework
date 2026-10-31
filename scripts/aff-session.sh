@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Script: aff-session.sh
-# Purpose: Structured Markdown session lifecycle journal for AIgile Forge
+# Purpose: Structured Markdown session lifecycle journal for aigile-forge-framework
 #          Framework workspaces. Persists incremental context under work/sessions/
 #          so interrupted or multi-day tickets resume cleanly across harnesses.
 # ==============================================================================
@@ -138,7 +138,7 @@ EOF
         printf '%s\n' "$SID" > "$LATEST_FILE"
         printf '%s\n' "$SID" > "$SESSIONS_DIR/latest-$TICKET_ID"
 
-        echo "==> [AFF Session] Started session $SID (ticket: $TICKET_ID)"
+        echo "==> [aigile-forge-framework:session] Started session $SID (ticket: $TICKET_ID)"
         echo "    Log file: $SESSION_FILE"
         ;;
 
@@ -157,7 +157,7 @@ EOF
         NOTE="${*:-Periodic session checkpoint}"
         ENTRY="- [$(now_utc)] $NOTE ($(git_summary "$WORKSPACE_DIR"))"
         append_to_section "$SESSION_FILE" "Checkpoints" "$ENTRY"
-        echo "==> [AFF Session] Recorded checkpoint in $SID"
+        echo "==> [aigile-forge-framework:session] Recorded checkpoint in $SID"
         ;;
 
     close)
@@ -186,7 +186,7 @@ EOF
         rm -f "$CURRENT_FILE"
         printf '%s\n' "$SID" > "$LATEST_FILE"
 
-        echo "==> [AFF Session] Closed session $SID"
+        echo "==> [aigile-forge-framework:session] Closed session $SID"
         echo "    Archived log: $SESSION_FILE"
         ;;
 
@@ -235,7 +235,7 @@ EOF
         append_to_section "$SESSION_FILE" "Checkpoints" "- [$(now_utc)] Session resumed ($(git_summary "$WORKSPACE_DIR"))"
         printf '%s\n' "$SID" > "$CURRENT_FILE"
 
-        echo "==> [AFF Session] Resumed session $SID"
+        echo "==> [aigile-forge-framework:session] Resumed session $SID"
         echo ""
         cat "$SESSION_FILE"
         ;;
@@ -243,16 +243,16 @@ EOF
     status)
         if [ -f "$CURRENT_FILE" ]; then
             SID="$(cat "$CURRENT_FILE")"
-            echo "==> [AFF Session] Active session: $SID ($SESSIONS_DIR/$SID.md)"
+            echo "==> [aigile-forge-framework:session] Active session: $SID ($SESSIONS_DIR/$SID.md)"
         else
-            echo "==> [AFF Session] No active session."
+            echo "==> [aigile-forge-framework:session] No active session."
         fi
         ;;
 
     list)
         ACTIVE_SID=""
         [ -f "$CURRENT_FILE" ] && ACTIVE_SID="$(cat "$CURRENT_FILE")"
-        echo "==> [AFF Session] Recorded sessions in $SESSIONS_DIR:"
+        echo "==> [aigile-forge-framework:session] Recorded sessions in $SESSIONS_DIR:"
         FOUND=0
         for f in $(ls -1t "$SESSIONS_DIR"/SES-*.md 2>/dev/null || true); do
             [ -f "$f" ] || continue

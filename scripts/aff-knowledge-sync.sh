@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Script: aff-knowledge-sync.sh
-# Purpose: Pluggable knowledge base synchronization for AIgile Forge Framework.
+# Purpose: Pluggable knowledge base synchronization for aigile-forge-framework.
 #          Supports 'local' (workspace-only), 'folder-sync' (shared/cloud-mounted
 #          directory copy via rsync or cp), and 'cortex-ai' (MCP-backed guidance).
 # ==============================================================================
@@ -152,7 +152,7 @@ if [ "$ACTION" = "status" ]; then
     if [ -d "$KNOWLEDGE_DIR" ]; then
         DOC_COUNT="$(find "$KNOWLEDGE_DIR" -type f -name '*.md' 2>/dev/null | wc -l | tr -d ' ')"
     fi
-    echo "==> [AFF Knowledge Sync] Status"
+    echo "==> [aigile-forge-framework:sync] Status"
     echo "    Workspace:      $WORKSPACE_DIR"
     echo "    Knowledge Dir:  $KNOWLEDGE_DIR ($DOC_COUNT markdown document(s))"
     echo "    Active Mode:    $NORMALIZED_MODE"
@@ -173,7 +173,7 @@ case "$NORMALIZED_MODE" in
     local)
         mkdir -p "$KNOWLEDGE_DIR"
         DOC_COUNT="$(find "$KNOWLEDGE_DIR" -type f 2>/dev/null | wc -l | tr -d ' ')"
-        echo "==> [AFF Knowledge Sync] Local mode active ($DOC_COUNT file(s) in $KNOWLEDGE_DIR)."
+        echo "==> [aigile-forge-framework:sync] Local mode active ($DOC_COUNT file(s) in $KNOWLEDGE_DIR)."
         echo "    No external folder destination required. Knowledge stays local to workspace."
         ;;
 
@@ -185,7 +185,7 @@ case "$NORMALIZED_MODE" in
         EFFECTIVE_DEST="${EFFECTIVE_DEST/#\~/$HOME}"
         mkdir -p "$KNOWLEDGE_DIR"
 
-        echo "==> [AFF Knowledge Sync] Synchronizing $KNOWLEDGE_DIR -> $EFFECTIVE_DEST/knowledge"
+        echo "==> [aigile-forge-framework:sync] Synchronizing $KNOWLEDGE_DIR -> $EFFECTIVE_DEST/knowledge"
         if [ "$DRY_RUN" = true ]; then
             echo "    [DRY-RUN] Would synchronize knowledge/ to $EFFECTIVE_DEST/knowledge"
             exit 0
@@ -205,7 +205,7 @@ case "$NORMALIZED_MODE" in
         ;;
 
     cortex-ai)
-        echo "==> [AFF Knowledge Sync] Cortex-AI MCP Knowledge Guidance"
+        echo "==> [aigile-forge-framework:sync] Cortex-AI MCP Knowledge Guidance"
         echo "    1. Ensure harnesses.mode is set to 'mcp' in aff.yaml and run:"
         echo "       ./aigile harness sync all"
         echo "    2. Verify environment variables DRIVE_ROOT_FOLDER_ID and NOTEBOOKLM_NOTEBOOK_ID."

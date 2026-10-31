@@ -42,7 +42,7 @@ Before Gate `G3`, the `reviewer` agent evaluates the diff across four orthogonal
 
 ## 4. Receipt-Driven Development (`./aigile receipt`)
 
-AFF replaces unverified completion claims with deterministic SHA256 JSON receipts:
+aigile-forge-framework replaces unverified completion claims with deterministic SHA256 JSON receipts:
 
 ```bash
 # Execute test suite and generate a signed Gate G4 receipt

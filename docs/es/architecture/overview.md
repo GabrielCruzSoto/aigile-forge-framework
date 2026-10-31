@@ -4,7 +4,7 @@
 
 ## 1. Estructura de la Fuente Canónica
 
-AIgile Forge Framework separa los **activos canónicos de ingeniería** de las **proyecciones específicas de cada harness** y de los **artefactos efímeros de ejecución**:
+aigile-forge-framework separa los **activos canónicos de ingeniería** de las **proyecciones específicas de cada harness** y de los **artefactos efímeros de ejecución**:
 
 ```text
 aigile-forge-framework/

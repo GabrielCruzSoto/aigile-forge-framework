@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Script: aigile
-# Purpose: Unified cross-platform CLI entrypoint for AIgile Forge Framework.
+# Purpose: Unified cross-platform CLI entrypoint for aigile-forge-framework.
 #          Supports Linux, macOS, WSL, and Windows (Git-Bash / MSYS).
 # ==============================================================================
 
@@ -16,7 +16,7 @@ shift || true
 
 print_help() {
     cat <<EOF
-AIgile Forge Framework CLI (v${AFF_VERSION})
+aigile-forge-framework CLI (v${AFF_VERSION})
 
 Usage:
   ./aigile <command> [options]
@@ -47,7 +47,7 @@ Init Options (./aigile init):
       --tracker <provider>   Issue tracker: jira | linear | github | gitlab | azure-devops | monday | markdown
       --prefix <PROJ>        Ticket key prefix (default: PROJ)
   -w, --workspace <dir>      Target workspace directory (defaults to current directory)
-      --zero-footprint       Exclude local AFF files via .git/info/exclude when git is present
+      --zero-footprint       Exclude local aigile-forge-framework files via .git/info/exclude when git is present
       --copy                 Force copying skills instead of symlinking
       --symlink              Force symlinking skills
   -y, --non-interactive      Run without interactive prompts using provided flags and defaults
@@ -242,9 +242,9 @@ run_init() {
     fi
 
     if [ "$LANG_CHOICE" = "es" ]; then
-        echo "==> [AIgile Forge] Inicializando espacio de trabajo en: $TARGET_WS"
+        echo "==> [aigile-forge-framework] Inicializando espacio de trabajo en: $TARGET_WS"
     else
-        echo "==> [AIgile Forge] Initializing project workspace at: $TARGET_WS"
+        echo "==> [aigile-forge-framework] Initializing project workspace at: $TARGET_WS"
     fi
 
     # Copy canonical framework directories into external workspace so it operates standalone
@@ -444,12 +444,12 @@ PY
 
     echo ""
     if [ "$LANG_CHOICE" = "es" ]; then
-        echo "==> [AIgile Forge] Espacio de trabajo inicializado correctamente."
+        echo "==> [aigile-forge-framework] Espacio de trabajo inicializado correctamente."
         echo "    Proyecto:  $PROJECT_SLUG ($TEAM_NAME)"
         echo "    Topología: $TOPOLOGY | Modo: $HARNESS_MODE"
         echo "    Siguiente paso: ejecute './aigile doctor' o el prompt '/init-team' en su agente."
     else
-        echo "==> [AIgile Forge] Workspace initialized successfully."
+        echo "==> [aigile-forge-framework] Workspace initialized successfully."
         echo "    Project:   $PROJECT_SLUG ($TEAM_NAME)"
         echo "    Topology:  $TOPOLOGY | Mode: $HARNESS_MODE"
         echo "    Next step: run './aigile doctor' or invoke '/init-team' in your AI harness."

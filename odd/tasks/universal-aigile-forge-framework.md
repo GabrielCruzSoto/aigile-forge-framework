@@ -4,10 +4,10 @@ Test runner: `bash tests/run-tests.sh` | Engram mirror: `odd/universal-aigile-fo
 
 ## Specs
 
-- **S1 — Standalone Repository & Non-Modification**:
-  - User verbatim: `"Quiero crear un nuevo framework muy similares a los siguientes proyectos aigile-forge-framework-copilot y aigile-forge-framework-redSalud Este nuevo framework debe tener el nombre aigile-forge-framework."` and `"este debe ser uno nuevo, no modificar."`
-  - Scope & Acceptance Criteria: Initialize independent git repository at `projects/aigile-forge-framework/`. Neither `projects/aigile-forge-framework-copilot/` nor `projects/aigile-forge-framework-redSalud/` may have any modified or untracked files introduced.
-  - Applicable Check: `git -C projects/aigile-forge-framework rev-parse --is-inside-work-tree` succeeds; `git status --porcelain` in both sibling repos remains unchanged.
+- **S1 — Standalone Repository, Canonical Name & Non-Modification**:
+  - User verbatim: `"Quiero crear un nuevo framework muy similares a los siguientes proyectos aigile-forge-framework-copilot y aigile-forge-framework-redSalud Este nuevo framework debe tener el nombre aigile-forge-framework."`, `"este debe ser uno nuevo, no modificar."`, and `"EL nombre del framework se debe mantener por aigile-forge-framework"`
+  - Scope & Acceptance Criteria: Initialize independent git repository at `projects/aigile-forge-framework/` and maintain the exact framework name `aigile-forge-framework` across all headers, titles, documentation, CLI banners, scripts, manifests, and workspace context (no `AIgile Forge Framework`, `Aigile Forge Framework`, `AIgile Forge`, `AFF Universal`, or standalone `AFF` branding). Neither `projects/aigile-forge-framework-copilot/` nor `projects/aigile-forge-framework-redSalud/` may have any modified or untracked files introduced.
+  - Applicable Check: `git -C projects/aigile-forge-framework rev-parse --is-inside-work-tree` succeeds; `bash tests/run-tests.sh` enforces zero non-canonical framework name variants; sibling repos remain untouched.
 
 - **S2 — Universal Multi-Harness & Copilot Architecture**:
   - User verbatim: `"Este debe ser un Framework Unificado Universal es la mejor opcional"`
@@ -38,7 +38,8 @@ Test runner: `bash tests/run-tests.sh` | Engram mirror: `odd/universal-aigile-fo
 - [x] **T2** (`S2`, `S3`, `S4`) | Route: `delegated` (Writer trigger: parallel unit 2/3 with disjoint surface; Risk: passive) | 14 core `skills/*/SKILL.md` + 5 optional `skills/cortex-ai-*/SKILL.md` + 7 pluggable stack `profiles/*.md` | Status: completed | Evidence: commit `3382bf2` (26 frontmatter schemas & zero-coupling audit PASS)
 - [x] **T3** (`S2`, `S3`, `S4`) | Route: `delegated` (Writer trigger: parallel unit 3/3 with disjoint surface; Risk: items 2 & 5) | Unified `./aigile` CLI, universal projector `scripts/aff-harness.sh` (Claude, OpenCode, Antigravity, Codex, Copilot) + operational scripts (`aff-doctor.sh`, `aff-worktree.sh`, `aff-receipt.sh`, `aff-session.sh`, `aff-secret-scan.sh`, `aff-knowledge-sync.sh`), and bilingual `README.md`, `README.es.md`, `docs/{en,es}/` | Status: completed | Evidence: commit `cfc1e70` (`bash -n`, CLI smoke, `./aigile doctor`, `./aigile harness check`, `./aigile scan` PASS)
 - [x] **T4** (`S1`, `S2`, `S3`, `S4`) | Route: `inline` + `independent verifier` (Verification trigger: High-risk items 2 security scanner & 5 installer/projector scripts) | Executable test suite `tests/run-tests.sh` (RED/GREEN & seam check across T1–T3), work-unit commits on `feat/universal-framework`, and independent scratch verification | Status: completed | Evidence: commit `cfc1e70` + `bash tests/run-tests.sh` (40/40 PASS) + independent verifier (`aff-verifier`) PASS on `S1`–`S4` in isolated `/tmp/aff-verifier.9Wfagm` (cleaned by parent)
-- [x] **T5** (`S1`, `S5`) | Route: `inline` (Risk: passive) | Register `context/aigile-forge-framework/context.md`, update `context/INDEX.md`, `AGENTS.md`, and `memory/NOW.md` in `Tools_Agents` root | Status: completed | Evidence: committed in `Tools_Agents` root `main`
+- [x] **T5** (`S1`, `S5`) | Route: `inline` (Risk: passive) | Register `context/aigile-forge-framework/context.md`, update `context/INDEX.md`, `AGENTS.md`, and `memory/NOW.md` in `Tools_Agents` root | Status: completed | Evidence: updated in `Tools_Agents` root
+- [x] **T6** (`S1`) | Route: `inline` (Risk: none) | Enforce exact canonical framework name `aigile-forge-framework` across all repository files, CLI banners, docs, `context.md`, and `NOW.md`, pinned by `tests/run-tests.sh` | Status: completed | Evidence: RED (`40 passed, 1 failed`) -> GREEN (`41 passed, 0 failed`) across 25 normalized files
 
 ## Log
 
@@ -46,3 +47,4 @@ Test runner: `bash tests/run-tests.sh` | Engram mirror: `odd/universal-aigile-fo
 - **L2 (2026-10-30)**: `"Este debe ser un Framework Unificado Universal es la mejor opcional y este debe ser uno nuevo, no modificar."`
 - **L3 (2026-10-30)**: Mapped both sibling repos via read-only explorer (`aff-explorer`). Initialized standalone git repo `projects/aigile-forge-framework/` (`main` -> `feat/universal-framework`). Engram MCP unavailable in session; local feature document created and mirror marked pending.
 - **L4 (2026-10-30)**: Executed `T1` (`5e905d5`), `T2` (`3382bf2`), `T3`+`T4` (`cfc1e70`). Caught and fixed `AFF_WORKSPACE_DIR` external-invocation seam in `aigile` during RED->GREEN run of `tests/run-tests.sh` (40/40 PASS). Independent `aff-verifier` verified `S1`–`S4` PASS (87 tracked + 274 generated files audited with 0 legacy/company hits); aligned two minor path/skill strings (`AGENTS.md`, `scripts/aff-knowledge-sync.sh`) and cleaned scratch `/tmp/aff-verifier.9Wfagm`.
+- **L5 (2026-10-30)**: `"EL nombre del framework se debe mantener por aigile-forge-framework"` — Reopened `S1` via `T6` to normalize all display/branding variants (`AIgile Forge Framework`, `AIgile Forge`, standalone `AFF`, `AFF Universal`) to the exact canonical name `aigile-forge-framework`.

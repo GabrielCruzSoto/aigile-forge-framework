@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Script: aff-secret-scan.sh
-# Purpose: Security guardrail scanner for AIgile Forge Framework workspaces.
+# Purpose: Security guardrail scanner for aigile-forge-framework workspaces.
 #          Scans staged git changes (default) or an explicit --path target for
 #          private keys, cloud/API tokens, hardcoded secrets, and raw 16-digit
 #          payment card numbers. Supports --install-hook for .git/hooks/pre-commit.
@@ -99,13 +99,13 @@ if [ -x "$REPO_ROOT/scripts/aff-secret-scan.sh" ]; then
 elif command -v aigile >/dev/null 2>&1; then
     exec aigile scan --staged --target-dir "$REPO_ROOT"
 else
-    echo "[AFF Scanner] WARN: scripts/aff-secret-scan.sh not found; skipping scan." >&2
+    echo "[aigile-forge-framework:scanner] WARN: scripts/aff-secret-scan.sh not found; skipping scan." >&2
     exit 0
 fi
 HOOK_EOF
 
     chmod +x "$hook_file"
-    echo "==> [AFF Scanner] Installed pre-commit security hook at: $hook_file"
+    echo "==> [aigile-forge-framework:scanner] Installed pre-commit security hook at: $hook_file"
 }
 
 if [ "$INSTALL_HOOK" = true ]; then
@@ -243,7 +243,7 @@ if mode == "path":
                     continue
                 files_to_scan.append(fpath)
 
-    print(f"==> [AFF Scanner] Scanning path: {target} ({len(files_to_scan)} file(s))")
+    print(f"==> [aigile-forge-framework:scanner] Scanning path: {target} ({len(files_to_scan)} file(s))")
     for fpath in files_to_scan:
         try:
             raw = fpath.read_bytes()
@@ -275,10 +275,10 @@ else:
 
     diff_text = diff_proc.stdout
     if not diff_text.strip():
-        print("==> [AFF Scanner] No staged git changes found. Clean.")
+        print("==> [aigile-forge-framework:scanner] No staged git changes found. Clean.")
         sys.exit(0)
 
-    print("==> [AFF Scanner] Scanning staged git changes...")
+    print("==> [aigile-forge-framework:scanner] Scanning staged git changes...")
     current_file = "<staged>"
     current_line = 0
     for raw_line in diff_text.splitlines():
@@ -298,10 +298,10 @@ else:
 if findings:
     for src, line_no, code, msg in findings:
         print(f"  [FAIL] {src}:{line_no} [{code}] {msg}", file=sys.stderr)
-    print(f"==> [AFF Scanner] Scan FAILED with {len(findings)} finding(s).", file=sys.stderr)
+    print(f"==> [aigile-forge-framework:scanner] Scan FAILED with {len(findings)} finding(s).", file=sys.stderr)
     sys.exit(1)
 
-print("==> [AFF Scanner] All security checks passed (0 findings).")
+print("==> [aigile-forge-framework:scanner] All security checks passed (0 findings).")
 sys.exit(0)
 PY
 }
@@ -319,22 +319,22 @@ if [ "$SCAN_MODE" = "path" ]; then
         echo "ERROR: scan path does not exist: $SCAN_PATH" >&2
         exit 1
     fi
-    echo "==> [AFF Scanner] Scanning path (shell fallback): $SCAN_PATH"
+    echo "==> [aigile-forge-framework:scanner] Scanning path (shell fallback): $SCAN_PATH"
     if grep -r -I -E -n \
         --exclude="aff-secret-scan.sh" \
         --exclude-dir={.git,node_modules,target,build,dist,.venv} \
         "$COMBINED_REGEX" "$SCAN_PATH" >&2; then
-        echo "==> [AFF Scanner] Scan FAILED." >&2
+        echo "==> [aigile-forge-framework:scanner] Scan FAILED." >&2
         exit 1
     fi
 else
-    echo "==> [AFF Scanner] Scanning staged git changes (shell fallback)..."
+    echo "==> [aigile-forge-framework:scanner] Scanning staged git changes (shell fallback)..."
     DIFF_ADDED="$(git -C "$TARGET_DIR" diff --cached -U0 --no-color --diff-filter=ACMR | grep -E '^\+[^+]' || true)"
     if [ -n "$DIFF_ADDED" ] && printf '%s\n' "$DIFF_ADDED" | grep -E -n "$COMBINED_REGEX" >&2; then
-        echo "==> [AFF Scanner] Scan FAILED." >&2
+        echo "==> [aigile-forge-framework:scanner] Scan FAILED." >&2
         exit 1
     fi
 fi
 
-echo "==> [AFF Scanner] All security checks passed (0 findings)."
+echo "==> [aigile-forge-framework:scanner] All security checks passed (0 findings)."
 exit 0

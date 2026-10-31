@@ -190,7 +190,7 @@ payload["receipt_sha256"] = receipt_sha
 
 out_path = Path(os.environ["AFF_OUT_FILE"])
 out_path.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
-print(f"==> [AFF Receipt] Generated {out_path} (exit={payload['exit_code']}, sha256={receipt_sha[:16]}...)")
+print(f"==> [aigile-forge-framework:receipt] Generated {out_path} (exit={payload['exit_code']}, sha256={receipt_sha[:16]}...)")
 PY
 
         exit "$CMD_EXIT"
@@ -262,11 +262,11 @@ current_head = os.environ["AFF_CURRENT_HEAD"]
 try:
     data = json.loads(receipt_path.read_text(encoding="utf-8"))
 except Exception as exc:
-    print(f"==> [AFF Receipt] VERIFY FAILED: invalid JSON in {receipt_path}: {exc}", file=sys.stderr)
+    print(f"==> [aigile-forge-framework:receipt] VERIFY FAILED: invalid JSON in {receipt_path}: {exc}", file=sys.stderr)
     sys.exit(1)
 
 if not isinstance(data, dict):
-    print("==> [AFF Receipt] VERIFY FAILED: receipt root must be a JSON object.", file=sys.stderr)
+    print("==> [aigile-forge-framework:receipt] VERIFY FAILED: receipt root must be a JSON object.", file=sys.stderr)
     sys.exit(1)
 
 required_fields = [
@@ -283,7 +283,7 @@ required_fields = [
 ]
 missing = [k for k in required_fields if k not in data]
 if missing:
-    print(f"==> [AFF Receipt] VERIFY FAILED: missing required field(s): {', '.join(missing)}", file=sys.stderr)
+    print(f"==> [aigile-forge-framework:receipt] VERIFY FAILED: missing required field(s): {', '.join(missing)}", file=sys.stderr)
     sys.exit(1)
 
 expected_sha = data.get("receipt_sha256")
@@ -292,19 +292,19 @@ canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_as
 actual_sha = hashlib.sha256(canonical).hexdigest()
 
 if actual_sha != expected_sha:
-    print("==> [AFF Receipt] VERIFY FAILED: receipt_sha256 mismatch (tampering detected).", file=sys.stderr)
+    print("==> [aigile-forge-framework:receipt] VERIFY FAILED: receipt_sha256 mismatch (tampering detected).", file=sys.stderr)
     print(f"    Expected: {expected_sha}", file=sys.stderr)
     print(f"    Actual:   {actual_sha}", file=sys.stderr)
     sys.exit(1)
 
 if verify_head and data.get("git_head") != current_head:
-    print("==> [AFF Receipt] VERIFY FAILED: git_head does not match current HEAD.", file=sys.stderr)
+    print("==> [aigile-forge-framework:receipt] VERIFY FAILED: git_head does not match current HEAD.", file=sys.stderr)
     print(f"    Receipt HEAD: {data.get('git_head')}", file=sys.stderr)
     print(f"    Current HEAD: {current_head}", file=sys.stderr)
     sys.exit(1)
 
 print(
-    f"==> [AFF Receipt] VERIFY OK: ticket={data['ticket_id']} gate={data['gate']} "
+    f"==> [aigile-forge-framework:receipt] VERIFY OK: ticket={data['ticket_id']} gate={data['gate']} "
     f"status={data.get('status', 'unknown')} sha256={actual_sha}"
 )
 PY
@@ -328,7 +328,7 @@ PY
             esac
         done
 
-        echo "==> [AFF Receipt] Stored receipts in $WORKSPACE_DIR/work:"
+        echo "==> [aigile-forge-framework:receipt] Stored receipts in $WORKSPACE_DIR/work:"
         FOUND=0
         if [ -d "$WORKSPACE_DIR/work" ]; then
             while IFS= read -r rfile; do

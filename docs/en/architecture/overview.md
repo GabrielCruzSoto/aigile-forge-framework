@@ -4,7 +4,7 @@
 
 ## 1. Canonical Source Layout
 
-AIgile Forge Framework separates **canonical engineering assets** from **projected harness targets** and **ephemeral runtime workspaces**:
+aigile-forge-framework separates **canonical engineering assets** from **projected harness targets** and **ephemeral runtime workspaces**:
 
 ```text
 aigile-forge-framework/

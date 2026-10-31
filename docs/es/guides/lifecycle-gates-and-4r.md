@@ -42,7 +42,7 @@ Antes de superar la compuerta `G3`, el agente `reviewer` inspecciona los cambios
 
 ## 4. Receipt-Driven Development (`./aigile receipt`)
 
-AFF sustituye las declaraciones subjetivas de finalización por recibos JSON deterministas firmados con SHA256:
+aigile-forge-framework sustituye las declaraciones subjetivas de finalización por recibos JSON deterministas firmados con SHA256:
 
 ```bash
 # Ejecutar pruebas y sellar el recibo de la compuerta G4

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# AIgile Forge Framework (AFF) — Deterministic End-to-End Verification Suite
+# aigile-forge-framework — Deterministic End-to-End Verification Suite
 # Covers ODD Specs S1, S2, S3, S4 in isolated mktemp scratch directories.
 # ==============================================================================
 
@@ -23,7 +23,7 @@ fail() {
     printf "  [FAIL] %s\n" "$1" >&2
 }
 
-echo "==> Running AIgile Forge Framework Verification Suite"
+echo "==> Running aigile-forge-framework Verification Suite"
 echo "    Repository: $REPO_ROOT"
 
 # ------------------------------------------------------------------------------
@@ -105,6 +105,19 @@ if grep -rnE -i "$FORBIDDEN_REGEX" "${AUDIT_TARGETS[@]}" >"$SCRATCH_ROOT/forbidd
     cat "$SCRATCH_ROOT/forbidden-hits.txt" >&2
 else
     pass "Zero company or legacy unit terms across all canonical files and docs"
+fi
+
+# S1/T6: Enforce exact canonical framework name `aigile-forge-framework` (no AIgile/Aigile/standalone AFF branding)
+NON_CANONICAL_NAME_A="AI""gile"
+NON_CANONICAL_NAME_B="Ai""gile"
+NON_CANONICAL_ACRONYM="\\bAF""F\\b"
+NAME_VARIANT_REGEX="(${NON_CANONICAL_NAME_A}|${NON_CANONICAL_NAME_B}|${NON_CANONICAL_ACRONYM})"
+
+if grep -rnE "$NAME_VARIANT_REGEX" "${AUDIT_TARGETS[@]}" >"$SCRATCH_ROOT/name-hits.txt" 2>/dev/null; then
+    fail "Non-canonical framework name variants found (must strictly be 'aigile-forge-framework'):"
+    head -n 15 "$SCRATCH_ROOT/name-hits.txt" >&2
+else
+    pass "Canonical framework name 'aigile-forge-framework' maintained across all files"
 fi
 
 # ------------------------------------------------------------------------------
