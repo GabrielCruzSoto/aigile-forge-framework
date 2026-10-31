@@ -1,10 +1,10 @@
 # aigile-forge-framework
 
-> **English documentation:** [`README.md`](README.md) | **Portal de documentación:** [`docs/es/index.md`](docs/es/index.md)
+> **English documentation:** [`README.md`](README.md) | **Portal de documentación:** [`docs/es/index.md`](docs/es/index.md) | **Licencia:** [MIT (`LICENSE`)](LICENSE)
 
-**`aigile-forge-framework`** es un marco universal y declarativo de ingeniería y gobierno asistido por IA para equipos de desarrollo de software. A partir de una única fuente canónica (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/` y `mcp/`), aigile-forge-framework proyecta de forma determinista instrucciones, agentes por rol, habilidades procedimentales (`skills`), perfiles tecnológicos y descriptores opcionales de MCP hacia **Claude Code**, **OpenCode**, **Google Antigravity**, **OpenAI Codex** y **GitHub Copilot**.
+**`aigile-forge-framework`** es un marco universal y declarativo de ingeniería y gobierno asistido por IA para equipos de desarrollo de software. A partir de una única fuente canónica (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/` y `mcp/`), `aigile-forge-framework` proyecta de forma determinista instrucciones operativas, agentes especializados por rol, habilidades procedimentales (`skills`), perfiles tecnológicos y descriptores opcionales de MCP hacia **Claude Code**, **OpenCode**, **Google Antigravity**, **OpenAI Codex** y **GitHub Copilot**.
 
-aigile-forge-framework se adapta a cualquier tamaño de equipo, pila tecnológica, topología de repositorios y herramienta de seguimiento de tickets sin acoplar el código fuente a ningún proveedor u organización específica.
+`aigile-forge-framework` se adapta a cualquier tamaño de equipo de desarrollo, pila tecnológica, topología de repositorios y herramienta de gestión de tickets sin acoplar el código fuente a ningún proveedor, dominio regulatorio u organización específica.
 
 ---
 
@@ -20,7 +20,7 @@ Ejecute el asistente unificado desde la raíz del repositorio para configurar un
 
 ### 2. Inicialización No Interactiva (CI / Automatización)
 
- Genere un espacio de trabajo `multi-root` o basado en `worktrees` mediante banderas explícitas:
+Genere un espacio de trabajo `multi-root` o basado en `worktrees` mediante banderas explícitas:
 
 ```bash
 # Espacio de trabajo declarativo Zero-MCP en topología multi-root
@@ -65,13 +65,13 @@ Ejecute el asistente unificado desde la raíz del repositorio para configurar un
 flowchart TD
     M["aff.yaml + AGENTS.md<br/>Contrato Canónico Único"] --> P["./aigile harness sync<br/>Proyector Determinista"]
     A["agents/*.md (10 Roles)"] --> P
-    S["skills/*/SKILL.md (Habilidades)"] --> P
+    S["skills/*/SKILL.md (14 Núcleo + 5 Cortex-AI)"] --> P
     PR["profiles/*.md (7 Perfiles de Stack)"] --> P
-    PM["prompts/*.prompt.md (Prompts Slash)"] --> P
+    PM["prompts/*.prompt.md (9 Prompts Slash)"] --> P
     MC["mcp/*.json (Fragmentos MCP Opcionales)"] --> P
 
     P --> C["Claude Code<br/>CLAUDE.md, .claude/{agents,skills}, .mcp.json*"]
-    P --> O["OpenCode<br/>AGENTS.md, .agents/{agents,skills}, opencode.json"]
+    P --> O["OpenCode<br/>AGENTS.md, .agents/{agents,skills}, .opencode/agents, opencode.json"]
     P --> G["Antigravity<br/>AGENTS.md, .agents/{agents,skills}, .agents/mcp_config.json*"]
     P --> X["Codex<br/>AGENTS.md, .agents/{agents,skills}"]
     P --> GH["GitHub Copilot<br/>.github/copilot-instructions.md<br/>.github/{instructions,agents,prompts,skills}"]
@@ -95,7 +95,7 @@ flowchart TD
 
 ## Modos de Operación: Zero-MCP vs Full-MCP
 
-aigile-forge-framework ofrece dos modos controlados mediante `harnesses.mode` en `aff.yaml` o la opción `--mode` de la CLI:
+`aigile-forge-framework` ofrece dos modos operativos controlados mediante `harnesses.mode` en `aff.yaml` o la opción `--mode` de la CLI:
 
 | Característica | Modo `zero-mcp` (Predeterminado) | Modo `mcp` (Conectado / Cortex-AI) |
 |---|---|---|
@@ -103,7 +103,7 @@ aigile-forge-framework ofrece dos modos controlados mediante `harnesses.mode` en
 | **Entornos restringidos / VDI corporativo** | Compatible de inmediato | Requiere binarios y credenciales MCP autorizadas |
 | **`.mcp.json` y `.agents/mcp_config.json`** | Omitidos o eliminados automáticamente | Generados desde `mcp/*.json` |
 | **`opencode.json`** | `"mcp": {}` vacío | Mapa `"mcp"` poblado |
-| **Sincronización de conocimiento** | `local` o `folder-sync` (`./aigile sync`) | Habilidades `cortex-ai-*` (Engram, CodeGraph, Drive, NotebookLM) |
+| **Sincronización de conocimiento** | `local` o `folder-sync` (`./aigile sync`) | Habilidades `cortex-ai-*` (Engram, CodeGraph, Google Drive, NotebookLM) |
 
 Puede alternar entre modos en cualquier momento ejecutando:
 
@@ -116,18 +116,18 @@ Puede alternar entre modos en cualquier momento ejecutando:
 
 ## Ciclo de Vida de 8 Fases y Compuertas Proporcionales (`G1`–`G4`)
 
-Cada requerimiento se clasifica proporcionalmente (`S`, `M`, `L`, `H`) a lo largo de 8 fases gobernadas por cuatro compuertas humanas (`G1`–`G4`) y evidencia criptográfica **Receipt-Driven Development (RDD)**:
+Cada requerimiento se clasifica proporcionalmente (`S`, `M`, `L`, `H`) a lo largo de 8 fases (Fases 0 a 7) gobernadas por cuatro compuertas humanas (`G1`–`G4`) y evidencia criptográfica **Receipt-Driven Development (RDD)**:
 
 | Fase | Nombre | Agente Principal | Artefactos Clave | Compuerta (`Gate`) |
 |---|---|---|---|---|
-| **0** | Recepción y Triaje (`S/M/L/H`) | `orchestrator` | `work/<ID>/ticket-in.md`, `state.yaml` | — |
-| **1** | Descubrimiento y Especificación | `pm` / `analyst` | `elicitation.md`, `spec.md`, estimación PERT | **`G1`** — Alcance y Definición de Listo (`G1a`/`G1b` opcional) |
-| **2** | Arquitectura y Contratos Primero | `architect` | `contract.md`, especificaciones OpenAPI/AsyncAPI/Esquemas | **`G2`** — Aprobación de Contrato y Paridad Multicanal |
-| **3** | Partición de Tareas y Aislamiento | `orchestrator` / `delivery` | `odd/tasks/*.md`, `worktrees/<ID>/` | — |
-| **4** | Implementación Guiada por Pruebas | `delivery` | Código productivo + pruebas automatizadas | — |
-| **5** | Revisión Adversarial 4R y Seguridad | `reviewer` / `security` / `qa` | `review-4r.md` (**Risk, Requirements, Regression, Resilience**) | **`G3`** — Aprobación 4R en Sesión Limpia y Seguridad |
-| **6** | Verificación de Entrega y Recibos | `qa` / `delivery` | `work/<ID>/evidence/receipt-G4.json` | **`G4`** — Preparación de Despliegue y Firma SHA256 |
-| **7** | Curaduría de Conocimiento y Cierre | `curator` / `orchestrator` | `knowledge/*.md`, `ticket-out.md`, cierre de sesión | — |
+| **0** | Incorporación del Equipo y Espacio de Trabajo | `onboarding` | `aff.yaml`, `knowledge/*.md` | Salud inicial con `./aigile doctor` |
+| **1** | Recepción, Triaje y Aislamiento (`S/M/L/H`) | `orchestrator` | `work/<ID>/ticket-in.md`, `state.yaml`, `worktrees/<ID>/` | Clasificación proporcional asignada |
+| **2** | Elicitación de Hipótesis y Estimación PERT | `pm` | `work/<ID>/elicitation.md` (incluye PERT) | Respuestas o valores por defecto confirmados |
+| **3** | Hidratación de Especificación y Cortes | `analyst` | `work/<ID>/spec.md`, `slices/*.md` | **`G1`** — Definición de Listo (`G1a`/`G1b` opcional) |
+| **4** | Diseño Guiado por Contratos y Paridad | `architect`, `security` | `work/<ID>/contract.md` | **`G2`** — Aprobación de Contrato y Paridad Multicanal |
+| **5** | Unidades de Trabajo Atómicas y TDD | `delivery` | `odd/tasks/<id>-<slug>.md`, código + pruebas | Unidades `<= 400` líneas en verde |
+| **6** | Auditoría 4R en Sesión Limpia y Refutación | `reviewer`, `qa` | `work/<ID>/review-4r.md`, `pr.md`, recibo `G3` | **`G3`** — Cero hallazgos `CRITICAL`/`HIGH` abiertos |
+| **7** | Verificación de Entrega, Recibo RDD y Curaduría | `qa`, `curator`, `orchestrator` | `work/<ID>/evidence/receipt-G4.json`, `knowledge/`, `ticket-out.md` | **`G4`** — Firma SHA256 y cierre documental |
 
 ---
 
@@ -135,13 +135,13 @@ Cada requerimiento se clasifica proporcionalmente (`S`, `M`, `L`, `H`) a lo larg
 
 Active o desactive los perfiles requeridos por su proyecto en la sección `profiles.enabled` de `aff.yaml`:
 
-1. **`backend-jvm-spring`** — Java 17/21, seguridad de nulos en Kotlin, Spring Boot, inyección por constructor y errores RFC 7807.
-2. **`backend-node-ts`** — TypeScript estricto, manejo asíncrono seguro en Node.js, validación de esquemas y trazabilidad estructurada.
-3. **`backend-python-go`** — Python tipado (`mypy`/`ruff`) y Go idiomático (`context.Context`, manejo explícito de errores).
-4. **`frontend-web`** — Aplicaciones web modernas (Angular/React/Vue), accesibilidad WCAG, aislamiento de estado y control de paquetes.
-5. **`mobile-native`** — Desarrollo nativo Android (Kotlin/Compose) e iOS (Swift/SwiftUI) con paridad opcional 1:1 frente a web.
-6. **`data-sql-nosql-cache`** — Índices obligatorios, validación de planes de ejecución, migraciones seguras, patrones NoSQL y TTL explícito en caché.
-7. **`cicd-containers`** — Contenedores multietapa sin usuario root, pipelines reproducibles, registros libres de secretos y reversión segura.
+1. **`backend-jvm-spring`** — Java 8/17/21+, seguridad de nulos en Kotlin, Spring Boot 2.x/3.x/4.x, inyección por constructor y errores RFC 7807.
+2. **`backend-node-ts`** — TypeScript estricto, manejo asíncrono acotado en Node.js, validación de esquemas en tiempo de ejecución y trazabilidad estructurada.
+3. **`backend-python-go`** — Python tipado (`mypy`/`pyright`, FastAPI/Django) y Go idiomático (`context.Context`, envoltura explícita de errores).
+4. **`frontend-web`** — Aplicaciones web modernas (Angular/React/Vue/Next.js), accesibilidad WCAG AA, aislamiento de estado y consumo tipado de contratos.
+5. **`mobile-native`** — Desarrollo nativo Android (Kotlin/Compose, Keystore) e iOS (Swift/SwiftUI, Keychain) con paridad opcional 1:1 frente a web.
+6. **`data-sql-nosql-cache`** — Índices obligatorios en predicados, validación de planes de ejecución, migraciones reversibles y claves de caché con TTL finito.
+7. **`cicd-containers`** — Contenedores multietapa sin usuario root, pipelines reproducibles, digests fijados y cero secretos en compilación.
 
 ---
 
@@ -149,20 +149,36 @@ Active o desactive los perfiles requeridos por su proyecto en la sección `profi
 
 | Comando | Descripción |
 |---|---|
-| `./aigile init [opciones]` | Inicializador interactivo o desatendido del espacio de trabajo (`--name`, `--team`, `--lang`, `--topology`, `--mode`, `--harnesses`, `--tracker`, `--prefix`, `--workspace`, `--non-interactive`). |
-| `./aigile harness <sync\|check\|status\|print\|clean>` | Proyecta la fuente canónica a los harnesses, valida esquemas, consulta el estado o limpia archivos generados. |
+| `./aigile init [opciones]` | Inicializador interactivo o desatendido del espacio de trabajo (`--name`, `--team`, `--lang`, `--topology`, `--mode`, `--harnesses`, `--tracker`, `--prefix`, `--workspace`, `--zero-footprint`, `--copy`, `--symlink`, `--non-interactive`). |
+| `./aigile harness <sync\|check\|status\|print\|clean>` | Proyecta la fuente canónica hacia los harnesses, valida esquemas, consulta el estado o limpia archivos generados. |
 | `./aigile doctor` | Verifica sistema operativo, `bash`, `git`, `python3`/`jq`, `aff.yaml`, modo activo y estado del hook `pre-commit`. |
 | `./aigile worktree <create\|list\|checkpoint\|remove>` | Gestiona árboles de trabajo Git aislados por ticket bajo `worktrees/<ticket-id>/`. |
 | `./aigile receipt <generate\|verify\|list>` | Genera recibos JSON sellados con SHA256 (`generate <id> <gate> -- <cmd...>`) y verifica su autenticidad (`verify <archivo> [--verify-head]`). |
-| `./aigile session <start\|checkpoint\|close\|resume>` | Administra bitácoras estructuradas de sesión en Markdown bajo `work/sessions/`. |
-| `./aigile scan [--path <ruta>\|--install-hook]` | Inspecciona cambios preparados en Git o rutas en busca de claves privadas, tokens de API, secretos fijos y números de tarjeta de 16 dígitos. |
+| `./aigile session <start\|checkpoint\|close\|resume\|status\|list>` | Administra bitácoras estructuradas de sesión en Markdown bajo `work/sessions/`. |
+| `./aigile scan [--path <ruta>\|--staged\|--install-hook]` | Inspecciona cambios preparados en Git o rutas en busca de claves privadas, tokens de API, secretos fijos y números PAN de 16 dígitos. |
 | `./aigile sync [--status\|--sync [--dest <dir>]]` | Consulta o sincroniza `knowledge/` en modos `local`, `folder-sync` o `cortex-ai`. |
 
 ---
 
-## Portal de Documentación
+## Suite de Manuales y Guías (`docs/es/`)
 
-- [Índice de Documentación (`docs/es/index.md`)](docs/es/index.md)
-- [Arquitectura y Proyector Universal (`docs/es/architecture/overview.md`)](docs/es/architecture/overview.md)
-- [Incorporación de Equipos y Topologías de Espacio de Trabajo (`docs/es/guides/onboarding-and-topologies.md`)](docs/es/guides/onboarding-and-topologies.md)
-- [Ciclo de Vida de 8 Fases, Compuertas G1–G4, Revisión 4R y Recibos RDD (`docs/es/guides/lifecycle-gates-and-4r.md`)](docs/es/guides/lifecycle-gates-and-4r.md)
+La documentación operativa en español está estructurada en 10 manuales técnicos diseñados para consulta directa por rol:
+
+| # | Manual / Guía | Audiencia Principal | Descripción |
+|---|---|---|---|
+| 1 | **[Portal de Documentación (`docs/es/index.md`)](docs/es/index.md)** | Todos los roles | Índice general, rutas de lectura recomendadas por perfil y mapa de navegación bilingüe. |
+| 2 | **[Arquitectura Universal (`docs/es/architecture/overview.md`)](docs/es/architecture/overview.md)** | Arquitectos, Tech Leads | Separación en 3 capas, proyector determinista, modos `zero-mcp` vs `mcp`, `--zero-footprint` y criptografía RDD. |
+| 3 | **[Instalación y Configuración (`docs/es/guides/installation-and-configuration.md`)](docs/es/guides/installation-and-configuration.md)** | Tech Leads, DevOps, Desarrolladores | Prerrequisitos por SO, modos de instalación, referencia campo por campo de `aff.yaml` v2.0, variables de entorno y diagnóstico. |
+| 4 | **[Incorporación de Equipos y Topologías (`docs/es/guides/onboarding-and-topologies.md`)](docs/es/guides/onboarding-and-topologies.md)** | Tech Leads, Scrum Masters, PM | Asistente `./aigile init`, entrevista `/init-team` de 6 dimensiones, topologías de repositorio, tickets y estimación PERT. |
+| 5 | **[Manual Operativo del Desarrollador (`docs/es/guides/developer-workflow-manual.md`)](docs/es/guides/developer-workflow-manual.md)** | Desarrolladores | Uso práctico en los 5 harnesses y 4 playbooks paso a paso: funcionalidad completa, interrupción sin `git stash`, hotfix `H` y paridad `L`. |
+| 6 | **[Ciclo de Vida de 8 Fases, Compuertas y 4R (`docs/es/guides/lifecycle-gates-and-4r.md`)](docs/es/guides/lifecycle-gates-and-4r.md)** | QA, Revisores, Tech Leads | Detalle de Fases 0–7, matriz `S/M/L/H`, checklists de `G1`–`G4`, protocolo 4R de dos pasadas y anatomía de recibos SHA256. |
+| 7 | **[Matriz de Compatibilidad Multi-Harness (`docs/es/harnesses/compatibility-matrix.md`)](docs/es/harnesses/compatibility-matrix.md)** | Todos los roles | Rutas proyectadas, transformaciones de encabezados YAML, esquemas JSON de MCP, `--symlink` vs `--copy` y limpieza. |
+| 8 | **[Catálogo de Agentes y Slash Prompts (`docs/es/catalog/agents-and-prompts.md`)](docs/es/catalog/agents-and-prompts.md)** | Desarrolladores, Analistas, PM | Especificación de los 10 agentes principales, los 7 sub-roles de `delivery` y los 9 comandos slash con sus cadenas de entrega. |
+| 9 | **[Catálogo de Habilidades y Perfiles de Stack (`docs/es/catalog/skills-and-profiles.md`)](docs/es/catalog/skills-and-profiles.md)** | Desarrolladores, Arquitectos | Las 14 `skills` de núcleo, las 5 `skills` opcionales `cortex-ai-*`, los 7 perfiles `profiles/*.md` y guía de extensión propia. |
+| 10 | **[Seguridad, Datos y Sincronización de Conocimiento (`docs/es/governance/security-and-knowledge-sync.md`)](docs/es/governance/security-and-knowledge-sync.md)** | Seguridad, DBA, Curadores | Reglas de `aff-secret-scan.sh`, protección PII/PHI/PCI, índices y TTL en caché, y operación `local`, `folder-sync` y `cortex-ai`. |
+
+---
+
+## Licencia
+
+Distribuido bajo la **Licencia MIT**. Consulte el archivo [`LICENSE`](LICENSE) en la raíz del repositorio para conocer los términos completos de uso, copia, modificación y distribución.

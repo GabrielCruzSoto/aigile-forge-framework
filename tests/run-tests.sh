@@ -85,6 +85,7 @@ FORBIDDEN_REGEX="(${LEGACY_UNIT_ES_ACCENT}|${LEGACY_UNIT_ES}|${LEGACY_UNIT_EN}|$
 
 AUDIT_TARGETS=(
     "$REPO_ROOT/AGENTS.md"
+    "$REPO_ROOT/LICENSE"
     "$REPO_ROOT/aff.yaml"
     "$REPO_ROOT/aigile"
     "$REPO_ROOT/README.md"
@@ -269,6 +270,41 @@ if "$REPO_ROOT/aigile" scan --path "$DIRTY_SCAN_DIR" >/dev/null 2>&1; then
 else
     pass "Secret scanner blocked synthetic AWS access key"
 fi
+
+# ------------------------------------------------------------------------------
+# S6: Open-Source MIT License & Comprehensive Bilingual Documentation Suite
+# ------------------------------------------------------------------------------
+echo ""
+echo "--- [S6] MIT License & Comprehensive Bilingual Documentation Suite ---"
+if [ -f "$REPO_ROOT/LICENSE" ] && grep -q "^MIT License$" "$REPO_ROOT/LICENSE" && grep -q "aigile-forge-framework Contributors" "$REPO_ROOT/LICENSE"; then
+    pass "Root MIT LICENSE present with neutral open-source copyright"
+else
+    fail "Missing or invalid MIT LICENSE file at repository root"
+fi
+
+REQUIRED_DOC_RELPATHS=(
+    "index.md"
+    "architecture/overview.md"
+    "guides/installation-and-configuration.md"
+    "guides/onboarding-and-topologies.md"
+    "guides/developer-workflow-manual.md"
+    "guides/lifecycle-gates-and-4r.md"
+    "harnesses/compatibility-matrix.md"
+    "catalog/agents-and-prompts.md"
+    "catalog/skills-and-profiles.md"
+    "governance/security-and-knowledge-sync.md"
+)
+
+for lang in en es; do
+    for doc_rel in "${REQUIRED_DOC_RELPATHS[@]}"; do
+        doc_full="$REPO_ROOT/docs/$lang/$doc_rel"
+        if [ -f "$doc_full" ] && [ "$(wc -l < "$doc_full")" -ge 60 ]; then
+            pass "Manual present and substantive (>=60 lines): docs/$lang/$doc_rel"
+        else
+            fail "Missing or stub manual (<60 lines): docs/$lang/$doc_rel"
+        fi
+    done
+done
 
 echo ""
 echo "=============================================================================="
