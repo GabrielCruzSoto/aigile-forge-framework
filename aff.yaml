@@ -1,11 +1,11 @@
 # ==============================================================================
 # aigile-forge-framework — Canonical Project & Team Manifest
-# Schema Version: 2.0
+# Schema Version: 1.0
 # Single source of truth projected across Claude Code, OpenCode, Antigravity,
 # Codex, and GitHub Copilot via `./aigile harness sync`.
 # ==============================================================================
 
-schema_version: "2.0"
+schema_version: "1.0"
 
 project:
   id: "starter-project"

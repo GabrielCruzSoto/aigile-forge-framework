@@ -18,7 +18,7 @@ Guide the user one concise dimension at a time (waiting for confirmation after e
 6. **Ways of Working, Tracker & Harness Mode:** `tracker.provider`, `tracker.ticket_prefix`, `estimation` (`pert` / `story-points` / `none`), `harnesses.mode` (`zero-mcp` | `mcp`), and `harnesses.enabled`.
 
 ## Expected Deliverables
-- Update `aff.yaml` (preserving valid YAML schema `"2.0"`).
+- Update `aff.yaml` (preserving valid YAML schema `"1.0"`).
 - Populate `knowledge/team/roster.md`, `knowledge/team/workflow.md`, `knowledge/domain/overview.md`, and `knowledge/architecture/system-map.md` from `templates/`.
 - If `workspace.topology` is `multi-root`, generate `<project-id>.code-workspace`.
 - Run `./aigile harness sync` and `./aigile doctor` to confirm readiness.

@@ -31,7 +31,7 @@ Every canonical file in `agents/<slug>.md` projects to `.claude/agents/<slug>.md
 - **Recommended Tools:** `["read", "search", "edit", "terminal"]`
 - **Primary Skills & Prompts:** `team-onboarding-bootstrap`, `/init-team`
 - **Inputs:** Existing repository structure (if any), `templates/aff.template.yaml`, stakeholder responses across 6 discovery dimensions.
-- **Outputs:** Configured `aff.yaml` (v2.0), `knowledge/{team-roster,domain-overview,architecture-map,team-workflow}.md`, optional `<project-id>.code-workspace`, and synced harnesses.
+- **Outputs:** Configured `aff.yaml` (v1.0), `knowledge/{team-roster,domain-overview,architecture-map,team-workflow}.md`, optional `<project-id>.code-workspace`, and synced harnesses.
 
 ### 2.2 `orchestrator` — Lifecycle & Workspace Orchestrator
 - **Canonical File:** `agents/orchestrator.md` | **Copilot Agent:** `@aff-orchestrator`

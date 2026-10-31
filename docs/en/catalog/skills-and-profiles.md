@@ -13,7 +13,7 @@ All 14 core skills work 100% locally in both `zero-mcp` and `mcp` modes and are 
 
 | # | Skill Name (`name`) | Canonical Path | Primary Agent(s) | Core Engineering Procedure & Artifact Output |
 |---|---|---|---|---|
-| 1 | **`team-onboarding-bootstrap`** | `skills/team-onboarding-bootstrap/SKILL.md` | `onboarding` | Executes the 6-dimension team discovery workflow, renders `aff.yaml` v2.0, populates `knowledge/`, and runs `./aigile harness sync`. |
+| 1 | **`team-onboarding-bootstrap`** | `skills/team-onboarding-bootstrap/SKILL.md` | `onboarding` | Executes the 6-dimension team discovery workflow, renders `aff.yaml` v1.0, populates `knowledge/`, and runs `./aigile harness sync`. |
 | 2 | **`bilingual-elicitation`** | `skills/bilingual-elicitation/SKILL.md` | `pm` | Converts sparse tickets into falsifiable domain hypotheses and `<= 10` prioritized `P1`–`P3` questions with defaults in `en` or `es` (`elicitation.md`). |
 | 3 | **`spec-crafting-hydration`** | `skills/spec-crafting-hydration/SKILL.md` | `analyst` | Hydrates stakeholder answers into deterministic `S#` specs, Gherkin `Given/When/Then` `AC-#` criteria, PERT tables, and Gate `G1` checks (`spec.md`). |
 | 4 | **`contract-first-design`** | `skills/contract-first-design/SKILL.md` | `architect` | Authors OpenAPI 3.1, AsyncAPI, GraphQL, or Protobuf schemas with RFC 7807 error taxonomies, N/N-1 compatibility, and mock payloads (`contract.md`). |

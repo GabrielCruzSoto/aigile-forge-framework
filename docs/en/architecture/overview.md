@@ -16,7 +16,7 @@ Every `aigile-forge-framework` workspace cleanly separates **what the team gover
 ```mermaid
 flowchart TB
     subgraph L1["Layer 1: Canonical Source of Truth (Human-Authored, Versioned)"]
-        AY["aff.yaml (Schema v2.0)"]
+        AY["aff.yaml (Schema v1.0)"]
         AM["AGENTS.md (Operational Contract)"]
         AG["agents/*.md (10 Role Agents)"]
         SK["skills/*/SKILL.md (14 Core + 5 Cortex-AI)"]

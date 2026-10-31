@@ -31,7 +31,7 @@ Conduct the interview one concise dimension at a time, offering sensible default
    - Issue tracker (`jira`, `linear`, `github`, `gitlab`, `azure-devops`, `monday`, `markdown`), ticket prefix (`PROJ`), estimation method (`pert` with `focus_factor` and `risk_buffer_days`), branching strategy, and operating mode (`zero-mcp` vs `mcp` / `cortex-ai`).
 
 ## Verifiable Outputs
-- Updated `aff.yaml` validated against schema version `"2.0"`.
+- Updated `aff.yaml` validated against schema version `"1.0"`.
 - Populated `knowledge/team/roster.md` and `knowledge/team/workflow.md`.
 - Populated `knowledge/domain/overview.md` and `knowledge/architecture/system-map.md`.
 - Optional `<project-id>.code-workspace` when `workspace.topology: "multi-root"`.

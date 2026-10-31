@@ -2,7 +2,7 @@
 
 > **Volver al Portal:** [`docs/es/index.md`](../index.md) | **English:** [`docs/en/guides/installation-and-configuration.md`](../../en/guides/installation-and-configuration.md)
 
-Este manual detalla los prerrequisitos de sistema operativo, los escenarios de instalación paso a paso, la referencia completa campo por campo del manifiesto `aff.yaml` (esquema `2.0`), las variables de entorno soportadas, el despliegue del hook de seguridad `pre-commit` y la guía de resolución de problemas mediante `./aigile doctor` y `./aigile harness check`.
+Este manual detalla los prerrequisitos de sistema operativo, los escenarios de instalación paso a paso, la referencia completa campo por campo del manifiesto `aff.yaml` (esquema `1.0`), las variables de entorno soportadas, el despliegue del hook de seguridad `pre-commit` y la guía de resolución de problemas mediante `./aigile doctor` y `./aigile harness check`.
 
 ---
 
@@ -111,13 +111,13 @@ Esto crea `~/workspaces/suite-comercio/repositories/` (donde usted clona sus rep
 
 ---
 
-## 3. Referencia Campo por Campo de `aff.yaml` (Esquema v2.0)
+## 3. Referencia Campo por Campo de `aff.yaml` (Esquema v1.0)
 
 El archivo `aff.yaml` en la raíz del espacio de trabajo gobierna el comportamiento de todos los scripts y agentes:
 
 | Sección / Clave | Tipo | Valores Admitidos / Ejemplo | Descripción Técnica |
 |---|---|---|---|
-| `schema_version` | `string` | `"2.0"` | Versión normativa del esquema del manifiesto. |
+| `schema_version` | `string` | `"1.0"` | Versión normativa del esquema del manifiesto. |
 | `project.id` | `string` | `"plataforma-pagos"` | Identificador único en formato `kebab-case` (usado también para `<id>.code-workspace`). |
 | `project.name` | `string` | `"Plataforma de Pagos"` | Nombre legible del proyecto inyectado en encabezados e instrucciones de Copilot. |
 | `project.namespace` | `string` | `"pagos"` | Prefijo corto para nombres de recursos y primer segmento del patrón de claves de caché. |
@@ -158,7 +158,7 @@ El archivo `aff.yaml` en la raíz del espacio de trabajo gobierna el comportamie
 ### Ejemplo Completo de `aff.yaml` en Producción
 
 ```yaml
-schema_version: "2.0"
+schema_version: "1.0"
 
 project:
   id: "comercio-omnicanal"

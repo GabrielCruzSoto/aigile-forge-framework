@@ -1,6 +1,6 @@
 # aigile-forge-framework
 
-> **Spanish documentation:** [`README.es.md`](README.es.md) | **Documentation Portal:** [`docs/en/index.md`](docs/en/index.md) | **License:** [MIT](LICENSE)
+> **Version:** `1.0.0` | **License:** [MIT](LICENSE) | **Spanish documentation:** [`README.es.md`](README.es.md) | **Documentation Portal:** [`docs/en/index.md`](docs/en/index.md) | **License:** [MIT](LICENSE)
 
 **`aigile-forge-framework`** is an open-source, universal, declarative engineering harness and governance framework for software development teams. From a single canonical source (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/`, and `mcp/`), `aigile-forge-framework` deterministically projects instructions, specialist role agents, procedural skills, stack guardrails, and optional MCP descriptors across **Claude Code**, **OpenCode**, **Google Antigravity**, **OpenAI Codex**, and **GitHub Copilot**.
 
@@ -167,7 +167,7 @@ Enable or disable technology guardrails in `aff.yaml` under `profiles.enabled`:
 |---|---|---|---|
 | 1 | **Documentation Portal & Role Learning Paths** | All Roles | [`docs/en/index.md`](docs/en/index.md) |
 | 2 | **Universal Architecture & Projector Deep Dive** | Architects, Tech Leads | [`docs/en/architecture/overview.md`](docs/en/architecture/overview.md) |
-| 3 | **Installation & `aff.yaml` v2.0 Configuration Manual** | Tech Leads, DevOps, Developers | [`docs/en/guides/installation-and-configuration.md`](docs/en/guides/installation-and-configuration.md) |
+| 3 | **Installation & `aff.yaml` v1.0 Configuration Manual** | Tech Leads, DevOps, Developers | [`docs/en/guides/installation-and-configuration.md`](docs/en/guides/installation-and-configuration.md) |
 | 4 | **Team Onboarding, Topologies & PERT Estimation** | Tech Leads, PMs, Scrum Masters | [`docs/en/guides/onboarding-and-topologies.md`](docs/en/guides/onboarding-and-topologies.md) |
 | 5 | **Day-to-Day Developer Operational Manual** | Software Engineers | [`docs/en/guides/developer-workflow-manual.md`](docs/en/guides/developer-workflow-manual.md) |
 | 6 | **8-Phase Lifecycle, Gates `G1`–`G4`, 4R & RDD Receipts** | QA, Reviewers, Tech Leads | [`docs/en/guides/lifecycle-gates-and-4r.md`](docs/en/guides/lifecycle-gates-and-4r.md) |

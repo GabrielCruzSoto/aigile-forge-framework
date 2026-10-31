@@ -1,6 +1,6 @@
 # aigile-forge-framework
 
-> **English documentation:** [`README.md`](README.md) | **Portal de documentación:** [`docs/es/index.md`](docs/es/index.md) | **Licencia:** [MIT (`LICENSE`)](LICENSE)
+> **Versión:** `1.0.0` | **Licencia:** [MIT](LICENSE) | **English documentation:** [`README.md`](README.md) | **Portal de documentación:** [`docs/es/index.md`](docs/es/index.md) | **Licencia:** [MIT (`LICENSE`)](LICENSE)
 
 **`aigile-forge-framework`** es un marco universal y declarativo de ingeniería y gobierno asistido por IA para equipos de desarrollo de software. A partir de una única fuente canónica (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/` y `mcp/`), `aigile-forge-framework` proyecta de forma determinista instrucciones operativas, agentes especializados por rol, habilidades procedimentales (`skills`), perfiles tecnológicos y descriptores opcionales de MCP hacia **Claude Code**, **OpenCode**, **Google Antigravity**, **OpenAI Codex** y **GitHub Copilot**.
 
@@ -168,7 +168,7 @@ La documentación operativa en español está estructurada en 10 manuales técni
 |---|---|---|---|
 | 1 | **[Portal de Documentación (`docs/es/index.md`)](docs/es/index.md)** | Todos los roles | Índice general, rutas de lectura recomendadas por perfil y mapa de navegación bilingüe. |
 | 2 | **[Arquitectura Universal (`docs/es/architecture/overview.md`)](docs/es/architecture/overview.md)** | Arquitectos, Tech Leads | Separación en 3 capas, proyector determinista, modos `zero-mcp` vs `mcp`, `--zero-footprint` y criptografía RDD. |
-| 3 | **[Instalación y Configuración (`docs/es/guides/installation-and-configuration.md`)](docs/es/guides/installation-and-configuration.md)** | Tech Leads, DevOps, Desarrolladores | Prerrequisitos por SO, modos de instalación, referencia campo por campo de `aff.yaml` v2.0, variables de entorno y diagnóstico. |
+| 3 | **[Instalación y Configuración (`docs/es/guides/installation-and-configuration.md`)](docs/es/guides/installation-and-configuration.md)** | Tech Leads, DevOps, Desarrolladores | Prerrequisitos por SO, modos de instalación, referencia campo por campo de `aff.yaml` v1.0, variables de entorno y diagnóstico. |
 | 4 | **[Incorporación de Equipos y Topologías (`docs/es/guides/onboarding-and-topologies.md`)](docs/es/guides/onboarding-and-topologies.md)** | Tech Leads, Scrum Masters, PM | Asistente `./aigile init`, entrevista `/init-team` de 6 dimensiones, topologías de repositorio, tickets y estimación PERT. |
 | 5 | **[Manual Operativo del Desarrollador (`docs/es/guides/developer-workflow-manual.md`)](docs/es/guides/developer-workflow-manual.md)** | Desarrolladores | Uso práctico en los 5 harnesses y 4 playbooks paso a paso: funcionalidad completa, interrupción sin `git stash`, hotfix `H` y paridad `L`. |
 | 6 | **[Ciclo de Vida de 8 Fases, Compuertas y 4R (`docs/es/guides/lifecycle-gates-and-4r.md`)](docs/es/guides/lifecycle-gates-and-4r.md)** | QA, Revisores, Tech Leads | Detalle de Fases 0–7, matriz `S/M/L/H`, checklists de `G1`–`G4`, protocolo 4R de dos pasadas y anatomía de recibos SHA256. |

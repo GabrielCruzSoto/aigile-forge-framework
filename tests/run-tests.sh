@@ -282,6 +282,12 @@ else
     fail "Missing or invalid MIT LICENSE file at repository root"
 fi
 
+if [ -f "$REPO_ROOT/VERSION" ] && [ "$(tr -d '[:space:]' < "$REPO_ROOT/VERSION")" = "1.0.0" ] && [ "$("$REPO_ROOT/aigile" --version)" = "aigile-forge-framework 1.0.0" ]; then
+    pass "Framework release version is 1.0.0 (VERSION + ./aigile --version)"
+else
+    fail "Expected framework version 1.0.0, got: VERSION=$(cat "$REPO_ROOT/VERSION" 2>/dev/null || echo missing), cli=$("$REPO_ROOT/aigile" --version 2>/dev/null || echo error)"
+fi
+
 REQUIRED_DOC_RELPATHS=(
     "index.md"
     "architecture/overview.md"

@@ -17,7 +17,7 @@ All 10 manuals in `docs/en/` have 1:1 Spanish counterparts under [`docs/es/`](..
 |---|---|---|
 | **[1. Documentation Portal](index.md)** *(this page)* | Portal | Role-based entry points, recommended reading order, CLI quick reference, and core principles. |
 | **[2. Universal Architecture & Projection](architecture/overview.md)** | Architecture | 3-layer model (canonical vs projected vs runtime), Mermaid data-flow, `zero-mcp` vs `mcp`, `.git/info/exclude`, SHA256 RDD cryptography. |
-| **[3. Installation & Configuration](guides/installation-and-configuration.md)** | Setup & Config | OS prerequisites (Linux, macOS, WSL2, Git-Bash), installation modes, complete `aff.yaml` v2.0 schema reference, env vars, pre-commit hooks, troubleshooting. |
+| **[3. Installation & Configuration](guides/installation-and-configuration.md)** | Setup & Config | OS prerequisites (Linux, macOS, WSL2, Git-Bash), installation modes, complete `aff.yaml` v1.0 schema reference, env vars, pre-commit hooks, troubleshooting. |
 | **[4. Onboarding & Workspace Topologies](guides/onboarding-and-topologies.md)** | Team Setup | Interactive `./aigile init` vs CI bootstrap, 6-dimension `/init-team` interview, `single-repo` / `worktrees` / `multi-root`, issue trackers, 3-point PERT calibration. |
 | **[5. Developer Workflow Manual](guides/developer-workflow-manual.md)** | Operations | Invoking agents/prompts in all 5 harnesses, end-to-end feature playbook, `<30s` context switching without `git stash`, hotfix `H` RCA, multi-repo `L` parity. |
 | **[6. Lifecycle, Gates `G1`–`G4`, 4R & Receipts](guides/lifecycle-gates-and-4r.md)** | Governance | Phases 0–7 exit criteria, `S/M/L/H` ceremony matrix, `G1` (`G1a`/`G1b`)–`G4` checklists, two-pass 4R + Refuter protocol, JSON receipt anatomy. |

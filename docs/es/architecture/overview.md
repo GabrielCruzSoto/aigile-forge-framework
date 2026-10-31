@@ -15,7 +15,7 @@ El problema habitual al adoptar múltiples asistentes de IA en un equipo de desa
 ```mermaid
 flowchart TB
     subgraph L1["Capa 1: Fuente Canónica Única (Editable y Versionada)"]
-        M["aff.yaml (Esquema 2.0)"]
+        M["aff.yaml (Esquema 1.0)"]
         C["AGENTS.md (Contrato Universal)"]
         AG["agents/*.md (10 Agentes de Rol)"]
         SK["skills/*/SKILL.md (14 Núcleo + 5 Cortex-AI)"]
@@ -51,7 +51,7 @@ flowchart TB
 ```text
 aigile-forge-framework/
 ├── aigile                     # Punto de entrada CLI unificado multiplataforma (Bash + Python 3)
-├── aff.yaml                   # Manifiesto declarativo de proyecto, equipo, topología y gobierno (v2.0)
+├── aff.yaml                   # Manifiesto declarativo de proyecto, equipo, topología y gobierno (v1.0)
 ├── AGENTS.md                  # Contrato operativo universal compartido por todos los harnesses
 ├── LICENSE                    # Licencia abierta MIT
 ├── agents/                    # 10 definiciones de agentes especializados neutrales al harness

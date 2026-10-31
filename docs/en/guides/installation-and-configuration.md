@@ -1,9 +1,9 @@
-# Installation & Configuration Manual (`aff.yaml` v2.0)
+# Installation & Configuration Manual (`aff.yaml` v1.0)
 
 > **Back to Portal:** [`docs/en/index.md`](../index.md) | **Español:** [`docs/es/guides/installation-and-configuration.md`](../../es/guides/installation-and-configuration.md)  
 > **Related Manuals:** [Architecture Overview](../architecture/overview.md) · [Onboarding & Topologies](onboarding-and-topologies.md) · [Harness Compatibility Matrix](../harnesses/compatibility-matrix.md)
 
-This manual provides end-to-end instructions for installing **`aigile-forge-framework`** across major operating systems, deploying it into standalone, existing, or multi-repository workspaces, and configuring every field of the canonical `aff.yaml` (Schema v2.0) manifest.
+This manual provides end-to-end instructions for installing **`aigile-forge-framework`** across major operating systems, deploying it into standalone, existing, or multi-repository workspaces, and configuring every field of the canonical `aff.yaml` (Schema v1.0) manifest.
 
 ---
 
@@ -91,14 +91,14 @@ This scaffolds `~/workspaces/omnichannel-suite/omnichannel-suite.code-workspace`
 
 ---
 
-## 3. Complete `aff.yaml` v2.0 Field-by-Field Reference
+## 3. Complete `aff.yaml` v1.0 Field-by-Field Reference
 
 `aff.yaml` is the single declarative configuration manifest at the workspace root. Whenever you modify `aff.yaml`, re-run `./aigile harness sync all` to propagate updates across all enabled harnesses.
 
 ### 3.1 `schema_version`, `project`, `team`, and `workspace`
 
 ```yaml
-schema_version: "2.0"
+schema_version: "1.0"
 
 project:
   id: "billing-platform"                # Kebab-case slug; names <id>.code-workspace in multi-root
