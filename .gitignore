@@ -1,0 +1,23 @@
+# Local runtime workspaces, worktrees, and ephemeral knowledge caches
+work/
+worktrees/
+archive/
+knowledge/
+.cortex-cache/
+
+# Generated harness projections (rebuilt deterministically via `./aigile harness sync`)
+CLAUDE.md
+opencode.json
+.mcp.json
+.claude/
+.agents/
+.github/
+*.code-workspace
+
+# Local overrides, logs, and OS noise
+*.local.yaml
+*.local.json
+*.log
+.DS_Store
+Thumbs.db
+*.swp
