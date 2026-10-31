@@ -39,6 +39,7 @@
       "instructions_strategy": "native-agents-md",
       "agents_dir": ".opencode/agents",
       "skills_dir": ".agents/skills",
+      "prompts_dir": ".opencode/prompts",
       "config_file": "opencode.json",
       "mcp_config": "opencode.json",
       "supports_mcp": true
@@ -49,6 +50,7 @@
       "instructions_strategy": "native-agents-md",
       "rules_dir": ".agents/rules",
       "skills_dir": ".agents/skills",
+      "workflows_dir": ".agents/workflows",
       "mcp_config": ".agents/mcp_config.json",
       "supports_mcp": true
     },

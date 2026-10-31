@@ -123,16 +123,21 @@ sync_skills_dir() {
         rm -f "$dest_path"
     fi
 
+    mkdir -p "$dest_path"
+
     if [ "$LINK_MODE" = "copy" ]; then
-        mkdir -p "$dest_path"
         cp -R "$src_skills"/. "$dest_path"/
         echo "  [OK] Copied skills -> $dest_rel"
     else
-        if [ "$src_skills" = "$TARGET_DIR/skills" ]; then
-            ln -s "../skills" "$dest_path"
-        else
-            ln -s "$src_skills" "$dest_path"
-        fi
+        for sdir in "$src_skills"/*; do
+            [ -d "$sdir" ] || continue
+            sname="$(basename "$sdir")"
+            if [ "$src_skills" = "$TARGET_DIR/skills" ]; then
+                ln -sf "../../skills/$sname" "$dest_path/$sname"
+            else
+                ln -sf "$sdir" "$dest_path/$sname"
+            fi
+        done
         echo "  [OK] Symlinked skills -> $dest_rel"
     fi
 }
@@ -508,6 +513,85 @@ def sync_copilot() -> None:
     print(f"  [OK] Synced {pr_count} slash prompt(s) -> .github/prompts/")
 
 
+def sync_claude_commands() -> int:
+    src_prompts = resolve_src("prompts")
+    if not src_prompts.is_dir():
+        return 0
+    c_cmd_dir = target_dir / ".claude" / "commands"
+    c_cmd_dir.mkdir(parents=True, exist_ok=True)
+    for stale in c_cmd_dir.glob("*.md"):
+        stale.unlink()
+    count = 0
+    for prfile in sorted(src_prompts.glob("*.prompt.md")):
+        slug = prfile.name[:-len(".prompt.md")] if prfile.name.endswith(".prompt.md") else prfile.stem
+        shutil.copy2(prfile, c_cmd_dir / f"{slug}.md")
+        count += 1
+    print(f"  [OK] Projected {count} slash command(s) -> .claude/commands/")
+    return count
+
+
+def sync_antigravity_workflows() -> int:
+    src_prompts = resolve_src("prompts")
+    if not src_prompts.is_dir():
+        return 0
+    ag_wf_dir = target_dir / ".agents" / "workflows"
+    ag_wf_dir.mkdir(parents=True, exist_ok=True)
+    for stale in ag_wf_dir.glob("*.md"):
+        stale.unlink()
+    count = 0
+    for prfile in sorted(src_prompts.glob("*.prompt.md")):
+        slug = prfile.name[:-len(".prompt.md")] if prfile.name.endswith(".prompt.md") else prfile.stem
+        shutil.copy2(prfile, ag_wf_dir / f"{slug}.md")
+        count += 1
+    print(f"  [OK] Projected {count} workflow(s) -> .agents/workflows/")
+    return count
+
+
+def sync_opencode_prompts() -> int:
+    src_prompts = resolve_src("prompts")
+    if not src_prompts.is_dir():
+        return 0
+    oc_pr_dir = target_dir / ".opencode" / "prompts"
+    oc_pr_dir.mkdir(parents=True, exist_ok=True)
+    for stale in oc_pr_dir.glob("*.prompt.md"):
+        stale.unlink()
+    count = 0
+    for prfile in sorted(src_prompts.glob("*.prompt.md")):
+        shutil.copy2(prfile, oc_pr_dir / prfile.name)
+        count += 1
+    print(f"  [OK] Synced {count} prompt(s) -> .opencode/prompts/")
+    return count
+
+
+def sync_prompt_skills(skills_rel: str) -> int:
+    src_prompts = resolve_src("prompts")
+    if not src_prompts.is_dir():
+        return 0
+    skills_dir = target_dir / skills_rel
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    count = 0
+    for prfile in sorted(src_prompts.glob("*.prompt.md")):
+        slug = prfile.name[:-len(".prompt.md")] if prfile.name.endswith(".prompt.md") else prfile.stem
+        sdir = skills_dir / slug
+        sdir.mkdir(parents=True, exist_ok=True)
+        text = prfile.read_text(encoding="utf-8", errors="replace")
+        meta, _, body = split_frontmatter(text)
+        desc = meta.get("description") or f"Slash command {slug}"
+        desc_escaped = desc.replace('"', '\\"')
+        rendered = (
+            "---\n"
+            f"name: {slug}\n"
+            f'description: "{desc_escaped}"\n'
+            "---\n\n"
+            + body.lstrip("\r\n").rstrip()
+            + "\n"
+        )
+        (sdir / "SKILL.md").write_text(rendered, encoding="utf-8")
+        count += 1
+    print(f"  [OK] Projected {count} prompt skill(s) -> {skills_rel}/")
+    return count
+
+
 if action == "print":
     targets = parse_target_harnesses(harness_arg, default_from_manifest=False)
     if len(targets) != 1:
@@ -522,6 +606,7 @@ if action == "print":
             "instructions": "CLAUDE.md -> @AGENTS.md",
             "skills": ".claude/skills",
             "agents": ".claude/agents",
+            "commands_dir": ".claude/commands",
             "mcp_file": ".mcp.json" if effective_mode == "mcp" else None,
             "mcp": {"mcpServers": build_stdio_mcp(mcp_servers, "claude", include_type=True)} if effective_mode == "mcp" else None,
         }
@@ -532,6 +617,7 @@ if action == "print":
             "instructions": "AGENTS.md",
             "skills": ".agents/skills",
             "agents": ".agents/agents",
+            "prompts_dir": ".opencode/prompts",
             "opencode_json": {
                 "$schema": "https://opencode.ai/config.json",
                 "mcp": build_opencode_mcp(mcp_servers) if effective_mode == "mcp" else {},
@@ -544,6 +630,7 @@ if action == "print":
             "instructions": "AGENTS.md",
             "skills": ".agents/skills",
             "agents": ".agents/agents",
+            "workflows_dir": ".agents/workflows",
             "mcp_file": ".agents/mcp_config.json" if effective_mode == "mcp" else None,
             "mcp": {"mcpServers": build_stdio_mcp(mcp_servers, "antigravity", include_type=False)} if effective_mode == "mcp" else None,
         }
@@ -588,11 +675,13 @@ This entry point imports the canonical [`AGENTS.md`](AGENTS.md) contract shared 
 - **Mode:** `{effective_mode}`
 - **Skills:** `.claude/skills/`
 - **Role Agents:** `.claude/agents/`
+- **Commands:** `.claude/commands/`
 - **Regenerate:** `./aigile harness sync claude`
 """
         (target_dir / "CLAUDE.md").write_text(claude_md_content, encoding="utf-8")
         print("  [OK] Generated CLAUDE.md (referencing AGENTS.md)")
         sync_standard_agents(".claude/agents")
+        sync_claude_commands()
 
         mcp_json_path = target_dir / ".mcp.json"
         if effective_mode == "mcp":
@@ -611,6 +700,7 @@ This entry point imports the canonical [`AGENTS.md`](AGENTS.md) contract shared 
 
     if "opencode" in targets:
         sync_standard_agents(".opencode/agents")
+        sync_opencode_prompts()
         opencode_payload = {
             "$schema": "https://opencode.ai/config.json",
             "mcp": build_opencode_mcp(mcp_servers) if effective_mode == "mcp" else {},
@@ -622,6 +712,7 @@ This entry point imports the canonical [`AGENTS.md`](AGENTS.md) contract shared 
         print(f"  [OK] Generated opencode.json (mode: {effective_mode})")
 
     if "antigravity" in targets:
+        sync_antigravity_workflows()
         ag_mcp_path = target_dir / ".agents" / "mcp_config.json"
         ag_mcp_path.parent.mkdir(parents=True, exist_ok=True)
         if effective_mode == "mcp":
@@ -638,6 +729,12 @@ This entry point imports the canonical [`AGENTS.md`](AGENTS.md) contract shared 
     if "copilot" in targets:
         sync_copilot()
 
+    sys.exit(0)
+
+if action == "sync_prompt_skills":
+    targets = parse_target_harnesses(harness_arg, default_from_manifest=False)
+    if any(h in targets for h in ("antigravity", "opencode", "codex")):
+        sync_prompt_skills(".agents/skills")
     sys.exit(0)
 
 if action == "check":
@@ -768,6 +865,7 @@ case "$SUBCOMMAND" in
             || [[ ",$HARNESS_LIST," == *",antigravity,"* ]] \
             || [[ ",$HARNESS_LIST," == *",codex,"* ]]; then
             sync_skills_dir ".agents/skills"
+            run_python_projector "sync_prompt_skills"
         fi
         if [ "$HARNESS_LIST" = "all" ] || [[ ",$HARNESS_LIST," == *",copilot,"* ]]; then
             sync_skills_dir ".github/skills"
@@ -798,10 +896,14 @@ case "$SUBCOMMAND" in
             "CLAUDE.md" \
             ".claude/skills" \
             ".claude/agents" \
+            ".claude/commands" \
             ".mcp.json" \
             "opencode.json" \
+            ".opencode/agents" \
+            ".opencode/prompts" \
             ".agents/skills" \
             ".agents/agents" \
+            ".agents/workflows" \
             ".agents/mcp_config.json" \
             ".github/copilot-instructions.md" \
             ".github/instructions" \
@@ -833,9 +935,9 @@ case "$SUBCOMMAND" in
     clean)
         echo "==> [aigile-forge-framework:harness] Cleaning generated harness projections in $TARGET_DIR..."
         rm -f "$TARGET_DIR/CLAUDE.md" "$TARGET_DIR/.mcp.json" "$TARGET_DIR/opencode.json"
-        rm -rf "$TARGET_DIR/.claude/skills" "$TARGET_DIR/.claude/agents"
-        rm -rf "$TARGET_DIR/.agents/skills" "$TARGET_DIR/.agents/agents" "$TARGET_DIR/.agents/mcp_config.json"
-        rm -rf "$TARGET_DIR/.opencode/agents"
+        rm -rf "$TARGET_DIR/.claude/skills" "$TARGET_DIR/.claude/agents" "$TARGET_DIR/.claude/commands"
+        rm -rf "$TARGET_DIR/.agents/skills" "$TARGET_DIR/.agents/agents" "$TARGET_DIR/.agents/workflows" "$TARGET_DIR/.agents/mcp_config.json"
+        rm -rf "$TARGET_DIR/.opencode/agents" "$TARGET_DIR/.opencode/prompts"
         rm -f "$TARGET_DIR/.github/copilot-instructions.md"
         rm -rf "$TARGET_DIR/.github/instructions" "$TARGET_DIR/.github/agents" "$TARGET_DIR/.github/prompts" "$TARGET_DIR/.github/skills"
         rmdir "$TARGET_DIR/.claude" "$TARGET_DIR/.agents" "$TARGET_DIR/.opencode" "$TARGET_DIR/.github" 2>/dev/null || true

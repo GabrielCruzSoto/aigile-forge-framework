@@ -136,8 +136,10 @@ pass "aigile harness sync all --copy --mode zero-mcp succeeded"
 for expected_path in \
     "$COPY_REPO/CLAUDE.md" \
     "$COPY_REPO/.claude/skills" \
+    "$COPY_REPO/.claude/commands" \
     "$COPY_REPO/opencode.json" \
     "$COPY_REPO/.agents/skills" \
+    "$COPY_REPO/.agents/workflows" \
     "$COPY_REPO/.github/copilot-instructions.md" \
     "$COPY_REPO/.github/instructions" \
     "$COPY_REPO/.github/agents" \

@@ -16,7 +16,7 @@ Todos los archivos de la tabla siguiente son materializados de forma determinist
 | **10 Agentes (`agents/*.md`)** | `.claude/agents/<rol>.md` | `.agents/agents/<rol>.md` y `.opencode/agents/<rol>.md` | `.agents/agents/<rol>.md` | `.agents/agents/<rol>.md` | `.github/agents/aff-<rol>.agent.md` |
 | **19 Habilidades (`skills/*/SKILL.md`)** | `.claude/skills/` | `.agents/skills/` | `.agents/skills/` | `.agents/skills/` | `.github/skills/` |
 | **7 Perfiles (`profiles/*.md`)** | Vía `AGENTS.md` + carga directa | Vía `AGENTS.md` + carga directa | Vía `AGENTS.md` + carga directa | Vía `AGENTS.md` + carga directa | `.github/instructions/<perfil>.instructions.md` |
-| **9 Prompts Slash (`prompts/*.prompt.md`)** | Invocación desde `prompts/*.prompt.md` | Invocación desde `prompts/*.prompt.md` | Invocación desde `prompts/*.prompt.md` | Invocación desde `prompts/*.prompt.md` | `.github/prompts/*.prompt.md` (`/comando` nativo) |
+| **9 Prompts Slash (`prompts/*.prompt.md`)** | `.claude/commands/<cmd>.md` (`/comando` nativo) | `.opencode/prompts/` y `.agents/skills/<cmd>/` | `.agents/workflows/<cmd>.md` y `.agents/skills/<cmd>/` | `.agents/skills/<cmd>/` | `.github/prompts/*.prompt.md` (`/comando` nativo) |
 | **Descriptor MCP (`harnesses.mode: "mcp"`)** | `.mcp.json` | `opencode.json` (`"mcp"` poblado) | `.agents/mcp_config.json` | Variables de entorno / CLI local | 100% declarativo IDE (sin archivo MCP generado) |
 | **Descriptor MCP (`harnesses.mode: "zero-mcp"`)** | `.mcp.json` **eliminado/omitido** | `opencode.json` con `"mcp": {}` | `.agents/mcp_config.json` **eliminado/omitido** | Ninguno | Ninguno |
 
