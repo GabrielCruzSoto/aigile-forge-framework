@@ -1,0 +1,23 @@
+{
+  "folders": [
+    {
+      "name": "{{HUB_NAME}} [00-Project-Hub — Governance & Knowledge]",
+      "path": "."
+    },
+    {
+      "name": "backend-service [Backend API]",
+      "path": "../backend-service"
+    },
+    {
+      "name": "frontend-web [Web Application]",
+      "path": "../frontend-web"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.git": false,
+      "**/.DS_Store": true
+    },
+    "github.copilot.chat.localeOverride": "{{LOCALE}}"
+  }
+}

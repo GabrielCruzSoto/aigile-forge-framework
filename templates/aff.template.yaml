@@ -1,0 +1,84 @@
+# ==============================================================================
+# AIgile Forge Framework (AFF) — Parameterized Project & Team Manifest Template
+# Rendered by `./aigile init` or the `onboarding` agent (`/init-team`).
+# ==============================================================================
+
+schema_version: "2.0"
+
+project:
+  id: "{{PROJECT_ID}}"
+  name: "{{PROJECT_NAME}}"
+  namespace: "{{PROJECT_NAMESPACE}}"
+
+team:
+  name: "{{TEAM_NAME}}"
+  lead_role: "Technical Lead"
+  language:
+    conversation: "{{LANG}}"
+    artifacts: "{{LANG}}"
+
+workspace:
+  topology: "{{TOPOLOGY}}"
+  hub_name: "00-Project-Hub"
+
+harnesses:
+  mode: "{{HARNESS_MODE}}"
+  enabled:
+    - "claude"
+    - "opencode"
+    - "antigravity"
+    - "codex"
+    - "copilot"
+
+tracker:
+  provider: "{{TRACKER_PROVIDER}}"
+  ticket_prefix: "{{TICKET_PREFIX}}"
+
+knowledge:
+  mode: "local"
+  sync_path: ""
+  cortex:
+    drive_root_folder_id: "${DRIVE_ROOT_FOLDER_ID}"
+    notebook_id: "${NOTEBOOKLM_NOTEBOOK_ID}"
+    engram_project: ""
+
+governance:
+  phases: 8
+  gates:
+    - "G1"
+    - "G2"
+    - "G3"
+    - "G4"
+  dual_po_approval: false
+  max_work_unit_loc: 400
+  require_4r_review: true
+  require_sha256_receipt: true
+  multi_channel_parity: false
+
+estimation:
+  method: "pert"
+  focus_factor: 0.75
+  risk_buffer_days: 1.0
+
+profiles:
+  enabled:
+    - "backend-jvm-spring"
+    - "backend-node-ts"
+    - "frontend-web"
+    - "data-sql-nosql-cache"
+    - "cicd-containers"
+
+lanes: []
+
+repositories: []
+
+guardrails:
+  redact_patterns:
+    - "secrets"
+    - "pii"
+    - "pci"
+    - "phi"
+  require_db_indexes: true
+  require_cache_ttl: true
+  cache_key_pattern: "{namespace}:{domain}:{service}:{entity}:{id}"
+  ban_git_stash: true

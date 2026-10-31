@@ -1,0 +1,77 @@
+{
+  "schema_version": "2.0",
+  "canonical_sources": {
+    "manifest": "aff.yaml",
+    "instructions": "AGENTS.md",
+    "agents": "agents",
+    "skills": "skills",
+    "profiles": "profiles",
+    "prompts": "prompts",
+    "templates": "templates",
+    "mcp_fragments": "mcp"
+  },
+  "modes": {
+    "zero-mcp": {
+      "emit_mcp_descriptors": false,
+      "include_cortex_skills": false,
+      "description": "100% declarative local mode with zero external MCP server descriptors or background daemons."
+    },
+    "mcp": {
+      "emit_mcp_descriptors": true,
+      "include_cortex_skills": true,
+      "description": "Connected mode projecting parameterized MCP server descriptors (Engram, CodeGraph, Google Drive, NotebookLM)."
+    }
+  },
+  "harnesses": {
+    "claude": {
+      "display_name": "Claude Code",
+      "instructions_target": "CLAUDE.md",
+      "instructions_strategy": "import-agents-md",
+      "agents_dir": ".claude/agents",
+      "skills_dir": ".claude/skills",
+      "prompts_dir": ".claude/commands",
+      "mcp_config": ".mcp.json",
+      "supports_mcp": true
+    },
+    "opencode": {
+      "display_name": "OpenCode",
+      "instructions_target": "AGENTS.md",
+      "instructions_strategy": "native-agents-md",
+      "agents_dir": ".opencode/agents",
+      "skills_dir": ".agents/skills",
+      "config_file": "opencode.json",
+      "mcp_config": "opencode.json",
+      "supports_mcp": true
+    },
+    "antigravity": {
+      "display_name": "Google Antigravity",
+      "instructions_target": "AGENTS.md",
+      "instructions_strategy": "native-agents-md",
+      "rules_dir": ".agents/rules",
+      "skills_dir": ".agents/skills",
+      "mcp_config": ".agents/mcp_config.json",
+      "supports_mcp": true
+    },
+    "codex": {
+      "display_name": "OpenAI Codex",
+      "instructions_target": "AGENTS.md",
+      "instructions_strategy": "native-agents-md",
+      "agents_dir": ".agents/roles",
+      "skills_dir": ".agents/skills",
+      "mcp_config": ".mcp.json",
+      "supports_mcp": true
+    },
+    "copilot": {
+      "display_name": "GitHub Copilot",
+      "instructions_target": ".github/copilot-instructions.md",
+      "instructions_strategy": "projected-markdown",
+      "profile_instructions_dir": ".github/instructions",
+      "agents_dir": ".github/agents",
+      "agent_filename_pattern": "aff-{name}.agent.md",
+      "prompts_dir": ".github/prompts",
+      "skills_dir": ".github/skills",
+      "mcp_config": null,
+      "supports_mcp": false
+    }
+  }
+}

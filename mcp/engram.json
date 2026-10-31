@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "engram": {
+      "type": "stdio",
+      "command": "${ENGRAM_BIN:-engram}",
+      "args": ["mcp", "--tools=agent"],
+      "env": {
+        "ENGRAM_PROJECT": "${ENGRAM_PROJECT}",
+        "ENGRAM_DATA_DIR": "${ENGRAM_DATA_DIR}"
+      }
+    }
+  }
+}

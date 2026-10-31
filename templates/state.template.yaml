@@ -1,0 +1,54 @@
+# ==============================================================================
+# AIgile Forge Framework (AFF) — Per-Ticket Lifecycle & Gate State
+# ==============================================================================
+
+ticket:
+  id: "PROJ-101"
+  slug: "feature-slug"
+  size_class: "M" # S | M | L | H
+  lane: "core"
+  status: "active" # active | paused | completed
+
+phase: 1 # 0..7
+
+gates:
+  G1:
+    approved: false
+    approver: ""
+    artifact_sha256: ""
+    date: ""
+  G1a:
+    approved: false
+    approver: ""
+    artifact_sha256: ""
+    date: ""
+  G1b:
+    approved: false
+    approver: ""
+    tracker_ref: ""
+    date: ""
+  G2:
+    approved: false
+    approvers: []
+    contract_sha256: ""
+    date: ""
+  G3:
+    approved: false
+    approvers: []
+    review_4r_verdict: "pending" # pending | approved | blocked
+    receipt_path: ""
+    pr_urls: []
+    date: ""
+  G4:
+    approved: false
+    approvers: []
+    receipt_path: ""
+    release_ref: ""
+    date: ""
+
+slices: []
+
+checkpoint:
+  last_paused_at: ""
+  reason: ""
+  next_step: ""

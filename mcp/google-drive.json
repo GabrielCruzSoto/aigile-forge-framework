@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "google-drive": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@piotr-agier/google-drive-mcp"],
+      "env": {
+        "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "${GOOGLE_DRIVE_OAUTH_CREDENTIALS}",
+        "DRIVE_ROOT_FOLDER_ID": "${DRIVE_ROOT_FOLDER_ID}"
+      }
+    }
+  }
+}

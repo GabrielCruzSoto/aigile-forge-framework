@@ -1,0 +1,95 @@
+# ==============================================================================
+# AIgile Forge Framework (AFF) — Canonical Project & Team Manifest
+# Schema Version: 2.0
+# Single source of truth projected across Claude Code, OpenCode, Antigravity,
+# Codex, and GitHub Copilot via `./aigile harness sync`.
+# ==============================================================================
+
+schema_version: "2.0"
+
+project:
+  id: "starter-project"
+  name: "Starter Engineering Project"
+  namespace: "starter"
+
+team:
+  name: "Core Product Engineering Team"
+  lead_role: "Technical Lead"
+  language:
+    conversation: "en" # en | es
+    artifacts: "en"    # en | es
+
+workspace:
+  # Supported topologies: single-repo | worktrees | multi-root
+  topology: "worktrees"
+  hub_name: "00-Project-Hub"
+
+harnesses:
+  # Supported modes: zero-mcp | mcp
+  mode: "zero-mcp"
+  # Supported harnesses: claude | opencode | antigravity | codex | copilot
+  enabled:
+    - "claude"
+    - "opencode"
+    - "antigravity"
+    - "codex"
+    - "copilot"
+
+tracker:
+  # Supported providers: jira | linear | github | gitlab | azure-devops | monday | markdown
+  provider: "markdown"
+  ticket_prefix: "PROJ"
+
+knowledge:
+  # Supported modes: local | git | cloud-folder | cortex-ai
+  mode: "local"
+  sync_path: ""
+  cortex:
+    drive_root_folder_id: "${DRIVE_ROOT_FOLDER_ID}"
+    notebook_id: "${NOTEBOOKLM_NOTEBOOK_ID}"
+    engram_project: ""
+
+governance:
+  phases: 8
+  gates:
+    - "G1"
+    - "G2"
+    - "G3"
+    - "G4"
+  dual_po_approval: false
+  max_work_unit_loc: 400
+  require_4r_review: true
+  require_sha256_receipt: true
+  multi_channel_parity: false
+
+estimation:
+  # Supported methods: pert | story-points | none
+  method: "pert"
+  focus_factor: 0.75
+  risk_buffer_days: 1.0
+
+profiles:
+  # Available stack profiles in profiles/*.md:
+  # backend-jvm-spring | backend-node-ts | backend-python-go | frontend-web |
+  # mobile-native | data-sql-nosql-cache | cicd-containers
+  enabled:
+    - "backend-jvm-spring"
+    - "backend-node-ts"
+    - "frontend-web"
+    - "data-sql-nosql-cache"
+    - "cicd-containers"
+
+lanes: []
+
+repositories: []
+
+guardrails:
+  redact_patterns:
+    - "secrets"
+    - "pii"
+    - "pci"
+    - "phi"
+  require_db_indexes: true
+  require_cache_ttl: true
+  cache_key_pattern: "{namespace}:{domain}:{service}:{entity}:{id}"
+  ban_git_stash: true

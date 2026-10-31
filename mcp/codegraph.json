@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "codegraph": {
+      "type": "stdio",
+      "command": "${CODEGRAPH_BIN:-codegraph}",
+      "args": ["serve", "--mcp"],
+      "env": {
+        "CODEGRAPH_WORKSPACE": "${CODEGRAPH_WORKSPACE}"
+      }
+    }
+  }
+}

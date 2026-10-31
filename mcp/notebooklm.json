@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "notebooklm": {
+      "type": "stdio",
+      "command": "${NOTEBOOKLM_MCP_BIN:-notebooklm-mcp}",
+      "args": [],
+      "env": {
+        "NOTEBOOKLM_NOTEBOOK_ID": "${NOTEBOOKLM_NOTEBOOK_ID}",
+        "NOTEBOOKLM_AUTH_PROFILE": "${NOTEBOOKLM_AUTH_PROFILE}"
+      }
+    }
+  }
+}
