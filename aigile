@@ -1,0 +1,505 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# Script: aigile
+# Purpose: Unified cross-platform CLI entrypoint for AIgile Forge Framework.
+#          Supports Linux, macOS, WSL, and Windows (Git-Bash / MSYS).
+# ==============================================================================
+
+set -euo pipefail
+
+AFF_VERSION="2.0.0"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPTS_DIR="$SCRIPT_DIR/scripts"
+
+SUBCOMMAND="${1:-help}"
+shift || true
+
+print_help() {
+    cat <<EOF
+AIgile Forge Framework CLI (v${AFF_VERSION})
+
+Usage:
+  ./aigile <command> [options]
+
+Commands:
+  init        Initialize or scaffold a project workspace and project AI harnesses
+  harness     Project, validate, inspect, or clean harness integrations
+              Subcommands: sync | check | status | print | clean
+  doctor      Run read-only environment and workspace baseline diagnostics
+  worktree    Manage ticket-isolated git worktrees (create | list | checkpoint | remove)
+  receipt     Generate and verify SHA256 RDD evidence receipts (generate | verify | list)
+  session     Manage structured Markdown work sessions (start | checkpoint | close | resume)
+  scan        Scan staged changes or paths for secrets/keys/PANs; install pre-commit hook
+  sync        Inspect or synchronize workspace knowledge (local | folder-sync | cortex-ai)
+  help        Display this help message
+
+Global Options:
+  -v, --version    Print framework version
+  -h, --help       Display this help message
+
+Init Options (./aigile init):
+  -n, --name <slug>          Project slug (e.g., billing-platform)
+  -t, --team <name>          Team display name (e.g., "Payments Platform Team")
+  -l, --lang <en|es>         Language for interactive messages & locale (default: en)
+      --topology <type>      Workspace topology: single-repo | worktrees | multi-root
+      --mode <mode>          Harness projection mode: zero-mcp | mcp (default: zero-mcp)
+      --harnesses <csv|all>  Target harnesses (all or csv of claude,opencode,antigravity,codex,copilot)
+      --tracker <provider>   Issue tracker: jira | linear | github | gitlab | azure-devops | monday | markdown
+      --prefix <PROJ>        Ticket key prefix (default: PROJ)
+  -w, --workspace <dir>      Target workspace directory (defaults to current directory)
+      --zero-footprint       Exclude local AFF files via .git/info/exclude when git is present
+      --copy                 Force copying skills instead of symlinking
+      --symlink              Force symlinking skills
+  -y, --non-interactive      Run without interactive prompts using provided flags and defaults
+EOF
+}
+
+slugify() {
+    local raw="$1"
+    local cleaned
+    cleaned="$(printf '%s' "$raw" | tr '[:upper:]' '[:lower:]' | tr ' _' '--' | sed 's/[^a-z0-9-]//g; s/-\{2,\}/-/g; s/^-//; s/-$//')"
+    printf '%s' "${cleaned:-starter-project}"
+}
+
+prompt_if_empty() {
+    local current_val="$1"
+    local prompt_text="$2"
+    local default_val="$3"
+    if [ -n "$current_val" ]; then
+        printf '%s' "$current_val"
+        return 0
+    fi
+    if [ "$NON_INTERACTIVE" = true ] || [ ! -t 0 ]; then
+        printf '%s' "$default_val"
+        return 0
+    fi
+    local user_input=""
+    read -r -p "$prompt_text [$default_val]: " user_input || true
+    printf '%s' "${user_input:-$default_val}"
+}
+
+configure_git_exclude() {
+    local ws_dir="$1"
+    local zero_fp="$2"
+
+    if ! git -C "$ws_dir" rev-parse --git-dir >/dev/null 2>&1; then
+        return 0
+    fi
+
+    local exclude_file
+    exclude_file="$(git -C "$ws_dir" rev-parse --git-path info/exclude)"
+    if [[ "$exclude_file" != /* ]]; then
+        exclude_file="$ws_dir/$exclude_file"
+    fi
+    mkdir -p "$(dirname "$exclude_file")"
+    touch "$exclude_file"
+
+    local patterns=("work/" "worktrees/")
+    if [ "$zero_fp" = true ]; then
+        patterns+=(
+            "aff.yaml"
+            "CLAUDE.md"
+            ".claude/"
+            ".mcp.json"
+            "opencode.json"
+            ".agents/"
+            ".opencode/"
+            ".github/copilot-instructions.md"
+            ".github/instructions/"
+            ".github/agents/"
+            ".github/prompts/"
+            ".github/skills/"
+        )
+    fi
+
+    for pat in "${patterns[@]}"; do
+        if ! grep -Fqx "$pat" "$exclude_file" 2>/dev/null; then
+            printf '%s\n' "$pat" >> "$exclude_file"
+        fi
+    done
+}
+
+run_init() {
+    PROJECT_SLUG=""
+    TEAM_NAME=""
+    LANG_CHOICE=""
+    TOPOLOGY=""
+    HARNESS_MODE=""
+    HARNESSES_CSV=""
+    TRACKER_PROVIDER=""
+    TICKET_PREFIX=""
+    WORKSPACE_ARG=""
+    ZERO_FOOTPRINT=false
+    FORCE_LINK_MODE=""
+    NON_INTERACTIVE=false
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -n|--name)
+                PROJECT_SLUG="$2"; shift 2 ;;
+            -t|--team)
+                TEAM_NAME="$2"; shift 2 ;;
+            -l|--lang)
+                LANG_CHOICE="$2"; shift 2 ;;
+            --topology)
+                TOPOLOGY="$2"; shift 2 ;;
+            --mode)
+                HARNESS_MODE="$2"; shift 2 ;;
+            --harnesses)
+                HARNESSES_CSV="$2"; shift 2 ;;
+            --tracker)
+                TRACKER_PROVIDER="$2"; shift 2 ;;
+            --prefix)
+                TICKET_PREFIX="$2"; shift 2 ;;
+            -w|--workspace)
+                WORKSPACE_ARG="$2"; shift 2 ;;
+            --zero-footprint)
+                ZERO_FOOTPRINT=true; shift ;;
+            --copy)
+                FORCE_LINK_MODE="copy"; shift ;;
+            --symlink)
+                FORCE_LINK_MODE="symlink"; shift ;;
+            -y|--non-interactive)
+                NON_INTERACTIVE=true; shift ;;
+            -h|--help)
+                print_help; exit 0 ;;
+            *)
+                echo "ERROR: unknown init option: $1" >&2
+                exit 1 ;;
+        esac
+    done
+
+    LANG_CHOICE="$(prompt_if_empty "$LANG_CHOICE" "Select language / Seleccione idioma (en|es)" "en")"
+    case "$LANG_CHOICE" in
+        en|es) ;;
+        *) echo "ERROR: --lang must be 'en' or 'es' (got '$LANG_CHOICE')." >&2; exit 1 ;;
+    esac
+
+    if [ "$LANG_CHOICE" = "es" ]; then
+        P_NAME="Identificador del proyecto (slug)"
+        P_TEAM="Nombre del equipo de desarrollo"
+        P_TOPO="Topología del espacio de trabajo (single-repo|worktrees|multi-root)"
+        P_MODE="Modo de integración (zero-mcp|mcp)"
+        P_HARN="Harnesses a proyectar (all o lista separada por comas)"
+        P_TRK="Gestor de tickets (jira|linear|github|gitlab|azure-devops|monday|markdown)"
+        P_PFX="Prefijo de tickets"
+        P_WS="Directorio destino del espacio de trabajo"
+    else
+        P_NAME="Project slug"
+        P_TEAM="Development team name"
+        P_TOPO="Workspace topology (single-repo|worktrees|multi-root)"
+        P_MODE="Harness integration mode (zero-mcp|mcp)"
+        P_HARN="Target harnesses (all or comma-separated list)"
+        P_TRK="Issue tracker provider (jira|linear|github|gitlab|azure-devops|monday|markdown)"
+        P_PFX="Ticket key prefix"
+        P_WS="Target workspace directory"
+    fi
+
+    RAW_NAME="$(prompt_if_empty "$PROJECT_SLUG" "$P_NAME" "starter-project")"
+    PROJECT_SLUG="$(slugify "$RAW_NAME")"
+    TEAM_NAME="$(prompt_if_empty "$TEAM_NAME" "$P_TEAM" "Core Engineering Team")"
+    TOPOLOGY="$(prompt_if_empty "$TOPOLOGY" "$P_TOPO" "worktrees")"
+    HARNESS_MODE="$(prompt_if_empty "$HARNESS_MODE" "$P_MODE" "zero-mcp")"
+    HARNESSES_CSV="$(prompt_if_empty "$HARNESSES_CSV" "$P_HARN" "all")"
+    TRACKER_PROVIDER="$(prompt_if_empty "$TRACKER_PROVIDER" "$P_TRK" "github")"
+    TICKET_PREFIX="$(prompt_if_empty "$TICKET_PREFIX" "$P_PFX" "PROJ")"
+    WORKSPACE_ARG="$(prompt_if_empty "$WORKSPACE_ARG" "$P_WS" "$PWD")"
+
+    case "$TOPOLOGY" in
+        single-repo|worktrees|multi-root) ;;
+        *) echo "ERROR: invalid --topology '$TOPOLOGY' (expected single-repo, worktrees, or multi-root)." >&2; exit 1 ;;
+    esac
+
+    case "$HARNESS_MODE" in
+        zero-mcp|mcp) ;;
+        *) echo "ERROR: invalid --mode '$HARNESS_MODE' (expected zero-mcp or mcp)." >&2; exit 1 ;;
+    esac
+
+    case "$TRACKER_PROVIDER" in
+        jira|linear|github|gitlab|azure-devops|monday|markdown) ;;
+        *) echo "ERROR: invalid --tracker '$TRACKER_PROVIDER'." >&2; exit 1 ;;
+    esac
+
+    mkdir -p "$WORKSPACE_ARG"
+    TARGET_WS="$(cd "$WORKSPACE_ARG" && pwd)"
+
+    IS_EXTERNAL=false
+    if [ "$TARGET_WS" != "$SCRIPT_DIR" ]; then
+        IS_EXTERNAL=true
+    fi
+
+    if [ -z "$FORCE_LINK_MODE" ]; then
+        if [ "$IS_EXTERNAL" = true ]; then
+            LINK_FLAG="--copy"
+        else
+            case "$(uname -s 2>/dev/null || echo 'Unknown')" in
+                CYGWIN*|MINGW*|MSYS*) LINK_FLAG="--copy" ;;
+                *) LINK_FLAG="--symlink" ;;
+            esac
+        fi
+    else
+        LINK_FLAG="--$FORCE_LINK_MODE"
+    fi
+
+    if [ "$LANG_CHOICE" = "es" ]; then
+        echo "==> [AIgile Forge] Inicializando espacio de trabajo en: $TARGET_WS"
+    else
+        echo "==> [AIgile Forge] Initializing project workspace at: $TARGET_WS"
+    fi
+
+    # Copy canonical framework directories into external workspace so it operates standalone
+    if [ "$IS_EXTERNAL" = true ]; then
+        for asset_dir in agents skills profiles prompts templates mcp configs scripts; do
+            if [ -d "$SCRIPT_DIR/$asset_dir" ]; then
+                mkdir -p "$TARGET_WS/$asset_dir"
+                cp -R "$SCRIPT_DIR/$asset_dir"/. "$TARGET_WS/$asset_dir"/
+            fi
+        done
+        if [ -f "$SCRIPT_DIR/AGENTS.md" ] && [ ! -f "$TARGET_WS/AGENTS.md" ]; then
+            cp "$SCRIPT_DIR/AGENTS.md" "$TARGET_WS/AGENTS.md"
+        fi
+        cp "$SCRIPT_DIR/aigile" "$TARGET_WS/aigile"
+        chmod +x "$TARGET_WS/aigile" "$TARGET_WS/scripts"/*.sh
+    fi
+
+    mkdir -p "$TARGET_WS/knowledge" "$TARGET_WS/work" "$TARGET_WS/sprints"
+    if [ "$TOPOLOGY" = "worktrees" ]; then
+        mkdir -p "$TARGET_WS/worktrees"
+    elif [ "$TOPOLOGY" = "multi-root" ]; then
+        mkdir -p "$TARGET_WS/repositories"
+    fi
+
+    # Render aff.yaml, knowledge/*.md, and multi-root .code-workspace deterministically
+    AFF_FRAMEWORK_DIR="$SCRIPT_DIR" \
+    AFF_TARGET_WS="$TARGET_WS" \
+    AFF_PROJECT_SLUG="$PROJECT_SLUG" \
+    AFF_TEAM_NAME="$TEAM_NAME" \
+    AFF_LANG="$LANG_CHOICE" \
+    AFF_TOPOLOGY="$TOPOLOGY" \
+    AFF_MODE="$HARNESS_MODE" \
+    AFF_HARNESSES="$HARNESSES_CSV" \
+    AFF_TRACKER="$TRACKER_PROVIDER" \
+    AFF_PREFIX="$TICKET_PREFIX" \
+    python3 - <<'PY'
+import datetime
+import json
+import os
+import re
+from pathlib import Path
+
+fw_dir = Path(os.environ["AFF_FRAMEWORK_DIR"])
+target_ws = Path(os.environ["AFF_TARGET_WS"])
+project_slug = os.environ["AFF_PROJECT_SLUG"]
+team_name = os.environ["AFF_TEAM_NAME"]
+lang = os.environ["AFF_LANG"]
+topology = os.environ["AFF_TOPOLOGY"]
+mode = os.environ["AFF_MODE"]
+harnesses_raw = os.environ["AFF_HARNESSES"]
+tracker = os.environ["AFF_TRACKER"]
+prefix = os.environ["AFF_PREFIX"]
+
+project_name = " ".join(part.capitalize() for part in project_slug.split("-"))
+namespace = project_slug.split("-")[0]
+hub_name = f"00-{project_slug}-hub"
+today_str = datetime.date.today().isoformat()
+
+tokens = {
+    "{{PROJECT_ID}}": project_slug,
+    "{{PROJECT_SLUG}}": project_slug,
+    "{{PROJECT_NAME}}": project_name,
+    "{{PROJECT_NAMESPACE}}": namespace,
+    "{{TEAM_NAME}}": team_name,
+    "{{LANG}}": lang,
+    "{{LOCALE}}": lang,
+    "{{TOPOLOGY}}": topology,
+    "{{HUB_NAME}}": hub_name,
+    "{{HARNESS_MODE}}": mode,
+    "{{TRACKER_PROVIDER}}": tracker,
+    "{{TICKET_PREFIX}}": prefix,
+    "YYYY-MM-DD": today_str,
+}
+
+
+def render_text(raw: str) -> str:
+    out = raw
+    for k, v in tokens.items():
+        out = out.replace(k, v)
+    return out
+
+
+# 1. Generate aff.yaml
+tpl_dir = target_ws / "templates" if (target_ws / "templates").is_dir() else fw_dir / "templates"
+aff_tpl = tpl_dir / "aff.template.yaml"
+if aff_tpl.exists():
+    aff_text = render_text(aff_tpl.read_text(encoding="utf-8"))
+else:
+    aff_text = f"""schema_version: "2.0"
+
+project:
+  id: "{project_slug}"
+  name: "{project_name}"
+  namespace: "{namespace}"
+
+team:
+  name: "{team_name}"
+  lead_role: "Technical Lead"
+  language:
+    conversation: "{lang}"
+    artifacts: "{lang}"
+
+workspace:
+  topology: "{topology}"
+  hub_name: "{hub_name}"
+
+harnesses:
+  mode: "{mode}"
+  enabled:
+    - "claude"
+    - "opencode"
+    - "antigravity"
+    - "codex"
+    - "copilot"
+
+tracker:
+  provider: "{tracker}"
+  ticket_prefix: "{prefix}"
+
+knowledge:
+  mode: "local"
+  sync_path: ""
+
+governance:
+  phases: 8
+  gates: ["G1", "G2", "G3", "G4"]
+  require_4r_review: true
+  require_sha256_receipt: true
+
+profiles:
+  enabled:
+    - "backend-jvm-spring"
+    - "backend-node-ts"
+    - "frontend-web"
+    - "data-sql-nosql-cache"
+    - "cicd-containers"
+"""
+
+if harnesses_raw != "all":
+    chosen = [h.strip() for h in harnesses_raw.split(",") if h.strip()]
+    if chosen:
+        replacement_block = "  enabled:\n" + "\n".join(f'    - "{h}"' for h in chosen)
+        aff_text = re.sub(
+            r"  enabled:\n(?:    -\s*\"[^\"]+\"\n?)+",
+            replacement_block + "\n",
+            aff_text,
+            count=1,
+        )
+
+(target_ws / "aff.yaml").write_text(aff_text, encoding="utf-8")
+print(f"  [OK] Generated manifest: {target_ws / 'aff.yaml'}")
+
+# 2. Populate knowledge/{team-roster,domain-overview,architecture-map,team-workflow}.md if absent
+knowledge_dir = target_ws / "knowledge"
+knowledge_dir.mkdir(parents=True, exist_ok=True)
+for kdoc in ("team-roster", "domain-overview", "architecture-map", "team-workflow"):
+    dest_md = knowledge_dir / f"{kdoc}.md"
+    if dest_md.exists():
+        continue
+    src_tpl = tpl_dir / f"{kdoc}.template.md"
+    if src_tpl.exists():
+        dest_md.write_text(render_text(src_tpl.read_text(encoding="utf-8")), encoding="utf-8")
+    else:
+        title = " ".join(w.capitalize() for w in kdoc.split("-"))
+        dest_md.write_text(f"# {title} — {project_name}\n\n- **Team:** {team_name}\n- **Updated:** {today_str}\n", encoding="utf-8")
+    print(f"  [OK] Created knowledge/{kdoc}.md")
+
+# 3. Generate <project-slug>.code-workspace when --topology multi-root
+if topology == "multi-root":
+    ws_tpl = tpl_dir / "workspace.code-workspace.template.json"
+    ws_out = target_ws / f"{project_slug}.code-workspace"
+    if ws_tpl.exists():
+        rendered_ws = render_text(ws_tpl.read_text(encoding="utf-8"))
+        # Validate JSON integrity
+        parsed_ws = json.loads(rendered_ws)
+        ws_out.write_text(json.dumps(parsed_ws, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    else:
+        fallback_ws = {
+            "folders": [
+                {"name": f"{hub_name} [Governance & Knowledge]", "path": "."},
+                {"name": "backend-service [Backend API]", "path": "repositories/backend-service"},
+                {"name": "frontend-web [Web Application]", "path": "repositories/frontend-web"},
+            ],
+            "settings": {
+                "files.exclude": {"**/.git": False, "**/.DS_Store": True},
+                "github.copilot.chat.localeOverride": lang,
+            },
+        }
+        ws_out.write_text(json.dumps(fallback_ws, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"  [OK] Generated multi-root workspace file: {ws_out.name}")
+PY
+
+    configure_git_exclude "$TARGET_WS" "$ZERO_FOOTPRINT"
+
+    # Project harnesses into target workspace
+    "$SCRIPTS_DIR/aff-harness.sh" sync "$HARNESSES_CSV" "$LINK_FLAG" --mode "$HARNESS_MODE" --target-dir "$TARGET_WS"
+
+    echo ""
+    if [ "$LANG_CHOICE" = "es" ]; then
+        echo "==> [AIgile Forge] Espacio de trabajo inicializado correctamente."
+        echo "    Proyecto:  $PROJECT_SLUG ($TEAM_NAME)"
+        echo "    Topología: $TOPOLOGY | Modo: $HARNESS_MODE"
+        echo "    Siguiente paso: ejecute './aigile doctor' o el prompt '/init-team' en su agente."
+    else
+        echo "==> [AIgile Forge] Workspace initialized successfully."
+        echo "    Project:   $PROJECT_SLUG ($TEAM_NAME)"
+        echo "    Topology:  $TOPOLOGY | Mode: $HARNESS_MODE"
+        echo "    Next step: run './aigile doctor' or invoke '/init-team' in your AI harness."
+    fi
+}
+
+# When invoked via /path/to/workspace/aigile from outside that workspace,
+# bind AFF_WORKSPACE_DIR to SCRIPT_DIR if PWD has no aff.yaml of its own.
+if [ -z "${AFF_WORKSPACE_DIR:-}" ]; then
+    if [ -f "$PWD/aff.yaml" ]; then
+        export AFF_WORKSPACE_DIR="$PWD"
+    elif [ -f "$SCRIPT_DIR/aff.yaml" ]; then
+        export AFF_WORKSPACE_DIR="$SCRIPT_DIR"
+    fi
+fi
+
+case "$SUBCOMMAND" in
+    init)
+        run_init "$@"
+        ;;
+    harness)
+        exec "$SCRIPTS_DIR/aff-harness.sh" "$@"
+        ;;
+    doctor)
+        exec "$SCRIPTS_DIR/aff-doctor.sh" "$@"
+        ;;
+    worktree)
+        exec "$SCRIPTS_DIR/aff-worktree.sh" "$@"
+        ;;
+    receipt)
+        exec "$SCRIPTS_DIR/aff-receipt.sh" "$@"
+        ;;
+    session)
+        exec "$SCRIPTS_DIR/aff-session.sh" "$@"
+        ;;
+    scan)
+        exec "$SCRIPTS_DIR/aff-secret-scan.sh" "$@"
+        ;;
+    sync)
+        exec "$SCRIPTS_DIR/aff-knowledge-sync.sh" "$@"
+        ;;
+    -v|--version|version)
+        echo "aigile-forge-framework ${AFF_VERSION}"
+        ;;
+    help|-h|--help)
+        print_help
+        ;;
+    *)
+        echo "ERROR: unknown command '$SUBCOMMAND'." >&2
+        print_help >&2
+        exit 1
+        ;;
+esac
