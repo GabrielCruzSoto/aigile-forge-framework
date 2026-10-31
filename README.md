@@ -1,10 +1,10 @@
 # aigile-forge-framework
 
-> **Spanish documentation:** [`README.es.md`](README.es.md) | **Documentation Portal:** [`docs/en/index.md`](docs/en/index.md)
+> **Spanish documentation:** [`README.es.md`](README.es.md) | **Documentation Portal:** [`docs/en/index.md`](docs/en/index.md) | **License:** [MIT](LICENSE)
 
-**`aigile-forge-framework`** is a universal, declarative engineering harness and governance framework for software development teams. From a single canonical source (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/`, and `mcp/`), aigile-forge-framework deterministically projects instructions, specialist role agents, procedural skills, stack guardrails, and optional MCP descriptors across **Claude Code**, **OpenCode**, **Google Antigravity**, **OpenAI Codex**, and **GitHub Copilot**.
+**`aigile-forge-framework`** is an open-source, universal, declarative engineering harness and governance framework for software development teams. From a single canonical source (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/`, and `mcp/`), `aigile-forge-framework` deterministically projects instructions, specialist role agents, procedural skills, stack guardrails, and optional MCP descriptors across **Claude Code**, **OpenCode**, **Google Antigravity**, **OpenAI Codex**, and **GitHub Copilot**.
 
-aigile-forge-framework adapts to any team size, technology stack, repository topology, and issue tracker without coupling your codebase to a specific AI vendor or organization.
+`aigile-forge-framework` adapts to any team size, technology stack, repository topology, and issue tracker without coupling your codebase to a specific AI vendor or organization.
 
 ---
 
@@ -94,7 +94,7 @@ flowchart TD
 
 ## Zero-MCP vs Full-MCP Modes
 
-aigile-forge-framework supports two operational modes controlled by `harnesses.mode` in `aff.yaml` or `--mode` on the CLI:
+`aigile-forge-framework` supports two operational modes controlled by `harnesses.mode` in `aff.yaml` or `--mode` on the CLI:
 
 | Capability | `zero-mcp` Mode (Default) | `mcp` Mode (Connected / Cortex-AI) |
 |---|---|---|
@@ -119,14 +119,14 @@ Work items are triaged proportionally (`S`, `M`, `L`, `H`) across an 8-phase lif
 
 | Phase | Name | Primary Role Agent | Key Artifact(s) | Gate |
 |---|---|---|---|---|
-| **0** | Intake & Triage (`S/M/L/H`) | `orchestrator` | `work/<ID>/ticket-in.md`, `state.yaml` | — |
-| **1** | Discovery & Specification | `pm` / `analyst` | `elicitation.md`, `spec.md`, PERT estimate | **`G1`** — Scope & DoR Sign-Off (`G1a`/`G1b` optional) |
-| **2** | Architecture & Contract-First | `architect` | `contract.md`, OpenAPI/AsyncAPI/Schema specs | **`G2`** — Contract & Cross-Channel Parity Sign-Off |
-| **3** | Task Slicing & Worktree Isolation | `orchestrator` / `delivery` | `odd/tasks/*.md`, `worktrees/<ID>/` | — |
-| **4** | Test-First Implementation | `delivery` | Production code + automated unit/integration tests | — |
-| **5** | Adversarial 4R & Security Review | `reviewer` / `security` / `qa` | `review-4r.md` (**Risk, Requirements, Regression, Resilience**) | **`G3`** — Clean-Session 4R & Security Approval |
-| **6** | Release Verification & Receipts | `qa` / `delivery` | `work/<ID>/evidence/receipt-G4.json` | **`G4`** — Release Readiness & Receipt Verification |
-| **7** | Knowledge Curation & Closure | `curator` / `orchestrator` | `knowledge/*.md`, `ticket-out.md`, session close | — |
+| **0** | Team & Workspace Onboarding | `onboarding` | `aff.yaml`, `knowledge/*.md` | `./aigile doctor` baseline |
+| **1** | Intake, Triage & Isolation | `orchestrator` | `work/<ID>/ticket-in.md`, `state.yaml`, worktree | Size (`S/M/L/H`) assigned |
+| **2** | Hypothesis Elicitation & PERT | `pm` | `work/<ID>/elicitation.md` | Stakeholder answers collected |
+| **3** | Functional Spec Hydration & Slices | `analyst` | `work/<ID>/spec.md`, `slices/*.md` | **`G1`** — Scope & DoR Sign-Off (`G1a`/`G1b` optional) |
+| **4** | Contract-First & Channel Parity | `architect` / `security` | `work/<ID>/contract.md` | **`G2`** — Contract & Security/Parity Sign-Off |
+| **5** | Work-Unit Planning & TDD Execution | `delivery` | `odd/tasks/*.md`, code + unit/integration tests | Every unit `<= 400` LoC |
+| **6** | Clean-Session 4R & Refuter Audit | `reviewer` / `qa` | `work/<ID>/review-4r.md`, `pr.md`, `receipt-G3.json` | **`G3`** — Clean-Session 4R & PR Approval |
+| **7** | Release Verification & Curation | `qa` / `curator` / `orchestrator` | `work/<ID>/evidence/receipt-G4.json`, `ticket-out.md` | **`G4`** — Release Readiness & Knowledge Sync |
 
 ---
 
@@ -134,12 +134,12 @@ Work items are triaged proportionally (`S`, `M`, `L`, `H`) across an 8-phase lif
 
 Enable or disable technology guardrails in `aff.yaml` under `profiles.enabled`:
 
-1. **`backend-jvm-spring`** — Java 17/21, Kotlin null-safety, Spring Boot, constructor injection, RFC 7807 error contracts.
+1. **`backend-jvm-spring`** — Java 8/17/21+, Kotlin null-safety, Spring Boot 2.x/3.x, constructor injection, RFC 7807 error contracts.
 2. **`backend-node-ts`** — Strict TypeScript, Node.js async boundaries, schema validation, structured logging.
-3. **`backend-python-go`** — Typed Python (`mypy`/`ruff`) and idiomatic Go (`context.Context`, explicit error wrapping).
-4. **`frontend-web`** — Modern Angular/React/Vue/Web standards, WCAG accessibility, state isolation, bundle discipline.
-5. **`mobile-native`** — Kotlin/Jetpack Compose (Android) & Swift/SwiftUI (iOS) with optional 1:1 API and UX parity.
-6. **`data-sql-nosql-cache`** — Relational indexing, execution-plan validation, safe migrations, NoSQL patterns, and explicit cache TTLs.
+3. **`backend-python-go`** — Typed Python (`mypy`/`ruff`/`pytest`) and idiomatic Go (`context.Context`, explicit error wrapping).
+4. **`frontend-web`** — Modern Angular/React/Vue/Next.js standards, WCAG AA accessibility, state isolation, zero client domain drift.
+5. **`mobile-native`** — Kotlin/Jetpack Compose (Android) & Swift/SwiftUI (iOS) with secure storage and optional 1:1 parity.
+6. **`data-sql-nosql-cache`** — Relational indexing, execution-plan validation, reversible migrations, NoSQL patterns, and finite cache TTLs.
 7. **`cicd-containers`** — Multi-stage non-root container builds, pinned pipelines, secret-free build logs, and rollback safety.
 
 ---
@@ -148,20 +148,36 @@ Enable or disable technology guardrails in `aff.yaml` under `profiles.enabled`:
 
 | Command | Description |
 |---|---|
-| `./aigile init [options]` | Interactive or non-interactive workspace bootstrapper (`--name`, `--team`, `--lang`, `--topology`, `--mode`, `--harnesses`, `--tracker`, `--prefix`, `--workspace`, `--non-interactive`). |
-| `./aigile harness <sync\|check\|status\|print\|clean>` | Project canonical sources to target harnesses, validate schemas, inspect status, or clean generated projections. |
+| `./aigile init [options]` | Interactive or non-interactive workspace bootstrapper (`--name`, `--team`, `--lang`, `--topology`, `--mode`, `--harnesses`, `--tracker`, `--prefix`, `--workspace`, `--zero-footprint`, `--copy`, `--symlink`, `--non-interactive`). |
+| `./aigile harness <sync\|check\|status\|print\|clean>` | Project canonical sources to target harnesses, validate schemas, inspect status, print JSON summaries, or clean projections. |
 | `./aigile doctor` | Verify OS, `bash`, `git`, `python3`/`jq`, `aff.yaml`, harness mode, and git pre-commit hook status. |
 | `./aigile worktree <create\|list\|checkpoint\|remove>` | Manage ticket-isolated git worktrees under `worktrees/<ticket-id>/`. |
 | `./aigile receipt <generate\|verify\|list>` | Generate SHA256-sealed JSON execution receipts (`generate <id> <gate> -- <cmd...>`) and verify integrity (`verify <file> [--verify-head]`). |
-| `./aigile session <start\|checkpoint\|close\|resume>` | Maintain structured Markdown session journals under `work/sessions/`. |
-| `./aigile scan [--path <p>\|--install-hook]` | Scan staged git diffs or paths for private keys, cloud/API tokens, hardcoded secrets, and raw 16-digit card numbers. |
+| `./aigile session <start\|checkpoint\|close\|resume\|status\|list>` | Maintain structured Markdown session journals under `work/sessions/`. |
+| `./aigile scan [--path <p>\|--staged\|--install-hook]` | Scan staged git diffs or paths for private keys, cloud/API tokens, hardcoded secrets, and raw 16-digit card numbers. |
 | `./aigile sync [--status\|--sync [--dest <dir>]]` | Inspect or synchronize `knowledge/` via `local`, `folder-sync`, or `cortex-ai` modes. |
 
 ---
 
-## Documentation Portal
+## Documentation & Manuals Suite (`docs/en/`)
 
-- [Documentation Index (`docs/en/index.md`)](docs/en/index.md)
-- [Architecture & Projector Overview (`docs/en/architecture/overview.md`)](docs/en/architecture/overview.md)
-- [Team Onboarding & Workspace Topologies (`docs/en/guides/onboarding-and-topologies.md`)](docs/en/guides/onboarding-and-topologies.md)
-- [8-Phase Lifecycle, Gates G1–G4, 4R Review & RDD Receipts (`docs/en/guides/lifecycle-gates-and-4r.md`)](docs/en/guides/lifecycle-gates-and-4r.md)
+`aigile-forge-framework` ships with a complete 10-document operational manual suite in English (mirrored 1:1 in Spanish under [`docs/es/index.md`](docs/es/index.md)):
+
+| # | Manual | Audience | Path |
+|---|---|---|---|
+| 1 | **Documentation Portal & Role Learning Paths** | All Roles | [`docs/en/index.md`](docs/en/index.md) |
+| 2 | **Universal Architecture & Projector Deep Dive** | Architects, Tech Leads | [`docs/en/architecture/overview.md`](docs/en/architecture/overview.md) |
+| 3 | **Installation & `aff.yaml` v2.0 Configuration Manual** | Tech Leads, DevOps, Developers | [`docs/en/guides/installation-and-configuration.md`](docs/en/guides/installation-and-configuration.md) |
+| 4 | **Team Onboarding, Topologies & PERT Estimation** | Tech Leads, PMs, Scrum Masters | [`docs/en/guides/onboarding-and-topologies.md`](docs/en/guides/onboarding-and-topologies.md) |
+| 5 | **Day-to-Day Developer Operational Manual** | Software Engineers | [`docs/en/guides/developer-workflow-manual.md`](docs/en/guides/developer-workflow-manual.md) |
+| 6 | **8-Phase Lifecycle, Gates `G1`–`G4`, 4R & RDD Receipts** | QA, Reviewers, Tech Leads | [`docs/en/guides/lifecycle-gates-and-4r.md`](docs/en/guides/lifecycle-gates-and-4r.md) |
+| 7 | **Multi-Harness Compatibility & Projection Matrix** | Platform Engineers, Tooling Owners | [`docs/en/harnesses/compatibility-matrix.md`](docs/en/harnesses/compatibility-matrix.md) |
+| 8 | **Agents, Delivery Sub-Roles & Slash Prompts Catalog** | All Engineers & Agents | [`docs/en/catalog/agents-and-prompts.md`](docs/en/catalog/agents-and-prompts.md) |
+| 9 | **Procedural Skills & Pluggable Stack Profiles Catalog** | Engineers, Architects | [`docs/en/catalog/skills-and-profiles.md`](docs/en/catalog/skills-and-profiles.md) |
+| 10 | **Security Guardrails, Data Governance & Knowledge Sync** | Security, Curators, DevOps | [`docs/en/governance/security-and-knowledge-sync.md`](docs/en/governance/security-and-knowledge-sync.md) |
+
+---
+
+## License
+
+`aigile-forge-framework` is open-source software released under the [MIT License](LICENSE) (`Copyright (c) 2026 aigile-forge-framework Contributors`).
