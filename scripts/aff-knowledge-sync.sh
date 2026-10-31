@@ -210,8 +210,10 @@ case "$NORMALIZED_MODE" in
         echo "       ./aigile harness sync all"
         echo "    2. Verify environment variables DRIVE_ROOT_FOLDER_ID and NOTEBOOKLM_NOTEBOOK_ID."
         echo "    3. Invoke procedural skills from your AI harness:"
-        echo "       - skills/cortex-ai-pull/SKILL.md   (hydrate local knowledge/ cache)"
-        echo "       - skills/cortex-ai-push/SKILL.md   (publish sanitized artifacts)"
-        echo "       - skills/cortex-ai-sync/SKILL.md   (reconcile index & memory pointers)"
+        echo "       - skills/cortex-ai-init/SKILL.md     (bootstrap Drive/NotebookLM/Engram pointers)"
+        echo "       - skills/cortex-ai-sync/SKILL.md     (reconcile knowledge/, Drive & memory pointers)"
+        echo "       - skills/cortex-ai-ask/SKILL.md      (query curated domain knowledge)"
+        echo "       - skills/cortex-ai-onboard/SKILL.md  (hydrate project context for new contributors)"
+        echo "       - skills/cortex-ai-status/SKILL.md   (audit index & sync freshness)"
         ;;
 esac

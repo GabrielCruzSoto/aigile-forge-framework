@@ -82,7 +82,7 @@ Teams select the isolation topology that matches their repository architecture:
 | 7 | **`work-unit-tdd`** | `skills/work-unit-tdd/` | `delivery` (`planner`, `implementer`) | Atomic TDD commits (`<= 400` LoC) |
 | 8 | **`db-cache-guardrails`** | `skills/db-cache-guardrails/` | `architect`, `delivery`, `security` | Indexed queries & finite-TTL cache keys |
 | 9 | **`adversarial-review-4r`** | `skills/adversarial-review-4r/` | `reviewer` | `work/<TICKET-ID>/review-4r.md` |
-| 10 | **`rdd-receipts`** | `skills/rdd-receipts/` | `qa`, `delivery` | `work/<TICKET-ID>/receipts/*<GATE>*.json` (SHA256) |
+| 10 | **`rdd-receipts`** | `skills/rdd-receipts/` | `qa`, `delivery` | `work/<TICKET-ID>/evidence/receipt-<GATE>.json` (SHA256) |
 | 11 | **`security-compliance-audit`** | `skills/security-compliance-audit/` | `security` | `work/<TICKET-ID>/security-review.md` |
 | 12 | **`incident-rca-debugging`** | `skills/incident-rca-debugging/` | `delivery`, `analyst` | `work/<TICKET-ID>/rca.md` + failing test |
 | 13 | **`pull-request-documentation`** | `skills/pull-request-documentation/` | `delivery` (`documenter`) | `work/<TICKET-ID>/pr.md` |
