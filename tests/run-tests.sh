@@ -226,23 +226,23 @@ git -C "$WS_WT" config user.email "test@example.org"
 git -C "$WS_WT" add . >/dev/null 2>&1
 git -C "$WS_WT" commit -m "chore: bootstrap workspace" >/dev/null 2>&1
 
-"$WS_WT/aigile" doctor >"$SCRATCH_ROOT/doctor.log" 2>&1
+(cd "$WS_WT" && ./aigile doctor) >"$SCRATCH_ROOT/doctor.log" 2>&1
 pass "aigile doctor passed in initialized workspace"
 
-"$WS_WT/aigile" session start LDG-101 >"$SCRATCH_ROOT/session.log" 2>&1
-"$WS_WT/aigile" session checkpoint "Defined contract" >>"$SCRATCH_ROOT/session.log" 2>&1
-"$WS_WT/aigile" session close "Completed unit" >>"$SCRATCH_ROOT/session.log" 2>&1
+(cd "$WS_WT" && ./aigile session start LDG-101) >"$SCRATCH_ROOT/session.log" 2>&1
+(cd "$WS_WT" && ./aigile session checkpoint "Defined contract") >>"$SCRATCH_ROOT/session.log" 2>&1
+(cd "$WS_WT" && ./aigile session close "Completed unit") >>"$SCRATCH_ROOT/session.log" 2>&1
 pass "aigile session lifecycle (start/checkpoint/close) succeeded"
 
-"$WS_WT/aigile" receipt generate LDG-101 G3 -- bash -c "echo deterministic_gate_ok" >"$SCRATCH_ROOT/receipt.log" 2>&1
+(cd "$WS_WT" && ./aigile receipt generate LDG-101 G3 -- bash -c "echo deterministic_gate_ok") >"$SCRATCH_ROOT/receipt.log" 2>&1
 RECEIPT_FILE="$(find "$WS_WT/work/LDG-101" -name '*G3*.json' | head -n 1)"
 if [ -n "$RECEIPT_FILE" ] && [ -f "$RECEIPT_FILE" ]; then
-    "$WS_WT/aigile" receipt verify "$RECEIPT_FILE" >"$SCRATCH_ROOT/receipt-verify.log" 2>&1
+    (cd "$WS_WT" && ./aigile receipt verify "$RECEIPT_FILE") >"$SCRATCH_ROOT/receipt-verify.log" 2>&1
     pass "SHA256 RDD receipt generated and verified ($RECEIPT_FILE)"
 
     TAMPERED_FILE="$SCRATCH_ROOT/tampered-receipt.json"
     python3 -c 'import json, sys; d=json.load(open(sys.argv[1])); d["command"]="echo tampered"; json.dump(d, open(sys.argv[2], "w"))' "$RECEIPT_FILE" "$TAMPERED_FILE"
-    if "$WS_WT/aigile" receipt verify "$TAMPERED_FILE" >/dev/null 2>&1; then
+    if (cd "$WS_WT" && ./aigile receipt verify "$TAMPERED_FILE") >/dev/null 2>&1; then
         fail "Tampered receipt unexpectedly passed verification"
     else
         pass "Tampered receipt rejected by SHA256 verification"
