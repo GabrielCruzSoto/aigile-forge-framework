@@ -394,24 +394,10 @@ def build_claude_tools(rec_tools: list[str]) -> str:
     return ", ".join(tools)
 
 
-def build_antigravity_tools(rec_tools: list[str]) -> tuple[bool, list[str]]:
+def build_antigravity_tools(rec_tools: list[str]) -> bool:
     has_write = "edit" in rec_tools
     has_exec = "terminal" in rec_tools
-    is_readonly = not (has_write or has_exec)
-
-    ag_tools = ["send_message", "view_file"]
-    if "read" in rec_tools:
-        ag_tools.extend(["read_file", "read_url_content"])
-    if "search" in rec_tools:
-        ag_tools.extend(["search_web", "read_resource", "list_resources"])
-    if has_write:
-        ag_tools.extend(["write_file", "edit_file"])
-    if has_exec:
-        ag_tools.extend(["run_command", "manage_task"])
-    ag_tools.extend(["ask_question", "schedule"])
-    seen = set()
-    deduped = [t for t in ag_tools if not (t in seen or seen.add(t))]
-    return is_readonly, deduped
+    return not (has_write or has_exec)
 
 
 def build_opencode_tools(rec_tools: list[str]) -> list[str]:
@@ -496,15 +482,12 @@ def sync_antigravity_agents() -> int:
             desc = m_role.group(1).strip() if m_role else slug.replace("-", " ").title()
         desc_escaped = desc.replace('"', '\\"')
         rec_tools = parse_recommended_tools(meta)
-        is_readonly, ag_tools = build_antigravity_tools(rec_tools)
-        tools_lines = "\n".join(f"  - {t}" for t in ag_tools)
+        is_readonly = build_antigravity_tools(rec_tools)
         rendered = (
             "---\n"
             f"name: {slug}\n"
             f'description: "{desc_escaped}"\n'
             f"readonly: {'true' if is_readonly else 'false'}\n"
-            "tools:\n"
-            f"{tools_lines}\n"
             "---\n\n"
             + body.lstrip("\r\n").rstrip()
             + "\n"
