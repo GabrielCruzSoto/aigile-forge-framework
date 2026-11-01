@@ -363,12 +363,89 @@ def infer_apply_to(profile_slug: str) -> str:
     return "**/*"
 
 
-def sync_standard_agents(dest_rel: str) -> int:
+def parse_recommended_tools(meta: dict) -> list[str]:
+    raw = meta.get("recommended_tools") or meta.get("tools") or ""
+    if not raw:
+        return ["read", "search", "edit", "terminal"]
+    if isinstance(raw, list):
+        return [str(x).strip().strip("\"'") for x in raw]
+    try:
+        loaded = json.loads(raw)
+        if isinstance(loaded, list):
+            return [str(x).strip().strip("\"'") for x in loaded]
+    except Exception:
+        pass
+    items = re.findall(r'[a-zA-Z0-9_-]+', str(raw))
+    return items if items else ["read", "search", "edit", "terminal"]
+
+
+def build_claude_tools(rec_tools: list[str]) -> str:
+    tools = []
+    if "terminal" in rec_tools:
+        tools.append("Bash")
+    if "edit" in rec_tools:
+        tools.append("Edit")
+    if "read" in rec_tools:
+        tools.append("Read")
+    if "search" in rec_tools:
+        tools.extend(["Grep", "Glob"])
+    if not tools:
+        tools = ["Read", "Grep", "Glob"]
+    return ", ".join(tools)
+
+
+def build_antigravity_tools(rec_tools: list[str]) -> tuple[bool, list[str]]:
+    has_write = "edit" in rec_tools
+    has_exec = "terminal" in rec_tools
+    is_readonly = not (has_write or has_exec)
+
+    ag_tools = ["send_message", "view_file"]
+    if "read" in rec_tools:
+        ag_tools.extend(["read_file", "read_url_content"])
+    if "search" in rec_tools:
+        ag_tools.extend(["search_web", "read_resource", "list_resources"])
+    if has_write:
+        ag_tools.extend(["write_file", "edit_file"])
+    if has_exec:
+        ag_tools.extend(["run_command", "manage_task"])
+    ag_tools.extend(["ask_question", "schedule"])
+    seen = set()
+    deduped = [t for t in ag_tools if not (t in seen or seen.add(t))]
+    return is_readonly, deduped
+
+
+def build_opencode_tools(rec_tools: list[str]) -> list[str]:
+    oc_tools = []
+    if "read" in rec_tools:
+        oc_tools.append("read")
+    if "search" in rec_tools:
+        oc_tools.append("search")
+    if "edit" in rec_tools:
+        oc_tools.extend(["write", "edit"])
+    if "terminal" in rec_tools:
+        oc_tools.append("bash")
+    return oc_tools if oc_tools else ["read"]
+
+
+def build_copilot_tools(rec_tools: list[str]) -> list[str]:
+    gh_tools = []
+    if "read" in rec_tools:
+        gh_tools.append("read")
+    if "search" in rec_tools:
+        gh_tools.append("search")
+    if "edit" in rec_tools:
+        gh_tools.append("edit")
+    if "terminal" in rec_tools:
+        gh_tools.append("execute")
+    return gh_tools if gh_tools else ["read"]
+
+
+def sync_claude_agents() -> int:
     src_agents = resolve_src("agents")
     if not src_agents.is_dir():
         print(f"ERROR: canonical agents directory not found: {src_agents}", file=sys.stderr)
         sys.exit(1)
-    dest = target_dir / dest_rel
+    dest = target_dir / ".claude" / "agents"
     dest.mkdir(parents=True, exist_ok=True)
     count = 0
     for md in sorted(src_agents.glob("*.md")):
@@ -382,18 +459,101 @@ def sync_standard_agents(dest_rel: str) -> int:
             m_role = re.search(r"^\s*-\s*\*\*(?:Role|Purpose):\*\*\s*(.+)$", body, re.M)
             desc = m_role.group(1).strip() if m_role else slug.replace("-", " ").title()
         desc_escaped = desc.replace('"', '\\"')
+        rec_tools = parse_recommended_tools(meta)
+        c_tools = build_claude_tools(rec_tools)
         rendered = (
             "---\n"
             f"name: {slug}\n"
             f'description: "{desc_escaped}"\n'
-            "mode: all\n"
+            f"tools: {c_tools}\n"
             "---\n\n"
             + body.lstrip("\r\n").rstrip()
             + "\n"
         )
         (dest / f"{slug}.md").write_text(rendered, encoding="utf-8")
         count += 1
-    print(f"  [OK] Projected {count} agent(s) -> {dest_rel}")
+    print(f"  [OK] Projected {count} agent(s) -> .claude/agents")
+    return count
+
+
+def sync_antigravity_agents() -> int:
+    src_agents = resolve_src("agents")
+    if not src_agents.is_dir():
+        print(f"ERROR: canonical agents directory not found: {src_agents}", file=sys.stderr)
+        sys.exit(1)
+    dest = target_dir / ".agents" / "agents"
+    dest.mkdir(parents=True, exist_ok=True)
+    count = 0
+    for md in sorted(src_agents.glob("*.md")):
+        if md.name.lower() == "readme.md":
+            continue
+        text = md.read_text(encoding="utf-8", errors="replace")
+        meta, _, body = split_frontmatter(text)
+        slug = meta.get("name") or md.stem
+        desc = meta.get("description") or ""
+        if not desc:
+            m_role = re.search(r"^\s*-\s*\*\*(?:Role|Purpose):\*\*\s*(.+)$", body, re.M)
+            desc = m_role.group(1).strip() if m_role else slug.replace("-", " ").title()
+        desc_escaped = desc.replace('"', '\\"')
+        rec_tools = parse_recommended_tools(meta)
+        is_readonly, ag_tools = build_antigravity_tools(rec_tools)
+        tools_lines = "\n".join(f"  - {t}" for t in ag_tools)
+        rendered = (
+            "---\n"
+            f"name: {slug}\n"
+            f'description: "{desc_escaped}"\n'
+            f"readonly: {'true' if is_readonly else 'false'}\n"
+            "tools:\n"
+            f"{tools_lines}\n"
+            "---\n\n"
+            + body.lstrip("\r\n").rstrip()
+            + "\n"
+        )
+        (dest / f"{slug}.md").write_text(rendered, encoding="utf-8")
+        agent_sub = dest / slug
+        agent_sub.mkdir(parents=True, exist_ok=True)
+        (agent_sub / "agent.md").write_text(rendered, encoding="utf-8")
+        count += 1
+    print(f"  [OK] Projected {count} agent(s) -> .agents/agents")
+    return count
+
+
+def sync_opencode_agents() -> int:
+    src_agents = resolve_src("agents")
+    if not src_agents.is_dir():
+        print(f"ERROR: canonical agents directory not found: {src_agents}", file=sys.stderr)
+        sys.exit(1)
+    dest = target_dir / ".opencode" / "agents"
+    dest.mkdir(parents=True, exist_ok=True)
+    count = 0
+    for md in sorted(src_agents.glob("*.md")):
+        if md.name.lower() == "readme.md":
+            continue
+        text = md.read_text(encoding="utf-8", errors="replace")
+        meta, _, body = split_frontmatter(text)
+        slug = meta.get("name") or md.stem
+        desc = meta.get("description") or ""
+        if not desc:
+            m_role = re.search(r"^\s*-\s*\*\*(?:Role|Purpose):\*\*\s*(.+)$", body, re.M)
+            desc = m_role.group(1).strip() if m_role else slug.replace("-", " ").title()
+        desc_escaped = desc.replace('"', '\\"')
+        rec_tools = parse_recommended_tools(meta)
+        oc_tools = build_opencode_tools(rec_tools)
+        tools_lines = "\n".join(f"  - {t}" for t in oc_tools)
+        rendered = (
+            "---\n"
+            f"name: {slug}\n"
+            f'description: "{desc_escaped}"\n'
+            "mode: all\n"
+            "tools:\n"
+            f"{tools_lines}\n"
+            "---\n\n"
+            + body.lstrip("\r\n").rstrip()
+            + "\n"
+        )
+        (dest / f"{slug}.md").write_text(rendered, encoding="utf-8")
+        count += 1
+    print(f"  [OK] Projected {count} agent(s) -> .opencode/agents")
     return count
 
 
@@ -489,11 +649,13 @@ def sync_copilot() -> None:
             agent_id = f"aff-{clean_slug}"
             desc = ameta.get("description") or f"aigile-forge-framework {clean_slug} specialist agent"
             desc_escaped = desc.replace('"', '\\"')
+            rec_tools = parse_recommended_tools(ameta)
+            gh_tools_str = json.dumps(build_copilot_tools(rec_tools))
             rendered_agent = (
                 "---\n"
                 f"name: {agent_id}\n"
                 f'description: "{desc_escaped}"\n'
-                "tools: ['read', 'search', 'edit', 'execute']\n"
+                f"tools: {gh_tools_str}\n"
                 "---\n\n"
                 + abody.lstrip("\r\n").rstrip()
                 + "\n"
@@ -680,7 +842,7 @@ This entry point imports the canonical [`AGENTS.md`](AGENTS.md) contract shared 
 """
         (target_dir / "CLAUDE.md").write_text(claude_md_content, encoding="utf-8")
         print("  [OK] Generated CLAUDE.md (referencing AGENTS.md)")
-        sync_standard_agents(".claude/agents")
+        sync_claude_agents()
         sync_claude_commands()
 
         mcp_json_path = target_dir / ".mcp.json"
@@ -695,11 +857,11 @@ This entry point imports the canonical [`AGENTS.md`](AGENTS.md) contract shared 
             else:
                 print("  [OK] Skipped .mcp.json (zero-mcp mode)")
 
-    if any(h in targets for h in ("opencode", "antigravity", "codex")):
-        sync_standard_agents(".agents/agents")
+    if any(h in targets for h in ("antigravity", "codex")):
+        sync_antigravity_agents()
 
     if "opencode" in targets:
-        sync_standard_agents(".opencode/agents")
+        sync_opencode_agents()
         sync_opencode_prompts()
         opencode_payload = {
             "$schema": "https://opencode.ai/config.json",
