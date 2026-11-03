@@ -14,7 +14,7 @@ aigile-forge-framework unifies CLI/agentic harnesses and IDE-native assistants a
 |---|---|---|---|---|
 | **Claude Code** | `CLAUDE.md` (`@AGENTS.md`) | `.claude/agents/*.md` + `.claude/commands/*.md` | `.claude/skills/` | `.mcp.json` |
 | **OpenCode** | `AGENTS.md` | `.opencode/agents/*.md` + `.opencode/prompts/*.prompt.md` | `.agents/skills/` (incl. slash prompts) | `opencode.json` |
-| **Antigravity** | `AGENTS.md` | `.agents/rules/` + `.agents/workflows/*.md` | `.agents/skills/` (incl. slash prompts) | `.agents/mcp_config.json` |
+| **Antigravity** | `AGENTS.md` | `.agents/agents/*.md` + `.agents/workflows/*.md` | `.agents/skills/` (incl. slash prompts) | `.agents/mcp_config.json` |
 | **Codex** | `AGENTS.md` | `agents/*.md` | `.agents/skills/` (incl. slash prompts) | `configs/harnesses.json` / MCP env |
 | **GitHub Copilot** | `.github/copilot-instructions.md` + `.github/instructions/*.instructions.md` | `.github/agents/aff-*.agent.md` + `.github/prompts/*.prompt.md` | `.github/skills/` | Zero-MCP native (IDE declarative) |
 

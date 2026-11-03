@@ -77,12 +77,31 @@ recommended_tools: ["read", "search", "edit"]
 ---
 ```
 
-**Projected for Claude Code / OpenCode / Antigravity / Codex (`.claude/agents/architect.md`, `.agents/agents/architect.md`):**
+#### Capability Model (Ports & Adapters)
+
+`recommended_tools` (alias: `capabilities`) declares **abstract capabilities**, never harness tool names. Allowed vocabulary: `read`, `search`, `edit`, `terminal`, `delegate` (aliases: `write`->`edit`, `execute`/`bash`->`terminal`, `agent`/`task`->`delegate`). `./aigile harness check` rejects unknown tokens.
+
+**Golden rule:** an allowlist is emitted only to **restrict** an agent, never to enable it. Agents holding both `edit` and `terminal` inherit the harness-native toolset, including file creation and subagent delegation.
+
+| Capability set | Claude Code (`.claude/agents/`) | Antigravity (`.agents/agents/`) | OpenCode (`.opencode/agents/`) | Copilot (`.github/agents/`) |
+|---|---|---|---|---|
+| Full (`edit` + `terminal`) | `tools` omitted (inherits all, incl. `Agent`) | `readonly: false`, no `tools` | no `tools` map (all enabled) | `read, search, edit, execute` |
+| Partial (e.g. `edit` without `terminal`) | `tools: Read, Grep, Glob, Write, Edit` | `readonly: false`, no `tools` | `tools: {bash: false}` | `read, search, edit` |
+| Read-only (no `edit`, no `terminal`) | `tools: Read, Grep, Glob` | `readonly: true` | `tools: {write: false, edit: false, patch: false, bash: false}` | `read, search` |
+| `delegate` | native via inherited `Agent` | native subagent tools (inherited) | native `task` (inherited) | adds `agent` |
+
+> Antigravity never receives a `tools` allowlist: its tool names are version-dependent and an allowlist silently strips write and delegation tools. OpenCode `tools` is always a boolean map, never a list.
+
+Agents declaring `delegate` (`orchestrator`, `delivery`) must include a `## Delegation Fallback` section: when a harness cannot spawn subagents, the role runs inline and records `mode: delegated | inline | blocked` in `state.yaml#execution_log`.
+
+**Projected for OpenCode (`.opencode/agents/architect.md`):**
 ```yaml
 ---
 name: architect
 description: "Designs API and event contracts, enforces N/N-1 backwards compatibility, data/cache models, and optional 1:1 multi-channel parity for Gate G2."
 mode: all
+tools:
+  bash: false
 ---
 ```
 
@@ -91,7 +110,7 @@ mode: all
 ---
 name: aff-architect
 description: "Designs API and event contracts, enforces N/N-1 backwards compatibility, data/cache models, and optional 1:1 multi-channel parity for Gate G2."
-tools: ['read', 'search', 'edit', 'execute']
+tools: ['read', 'search', 'edit']
 ---
 ```
 

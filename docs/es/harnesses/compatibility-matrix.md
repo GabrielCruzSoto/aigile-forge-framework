@@ -62,12 +62,34 @@ Todos los archivos de la tabla siguiente son materializados de forma determinist
 Dado que cada herramienta exige metadatos distintos, `scripts/aff-harness.sh` transforma automáticamente el frontmatter canónico durante la proyección:
 
 ### 3.1 Agentes Estándar (`claude`, `opencode`, `antigravity`, `codex`)
-A partir de `agents/reviewer.md`, el proyector escribe `.claude/agents/reviewer.md`, `.agents/agents/reviewer.md` y `.opencode/agents/reviewer.md` con formato uniforme:
+
+#### Modelo de Capacidades (Puertos y Adaptadores)
+
+`recommended_tools` (alias: `capabilities`) declara **capacidades abstractas**, nunca nombres de herramientas de un harness. Vocabulario permitido: `read`, `search`, `edit`, `terminal`, `delegate` (alias: `write`->`edit`, `execute`/`bash`->`terminal`, `agent`/`task`->`delegate`). `./aigile harness check` rechaza tokens desconocidos.
+
+**Regla de oro:** una lista de herramientas permitidas solo se emite para **restringir** a un agente, nunca para habilitarlo. Los agentes con `edit` y `terminal` heredan el conjunto nativo del harness, incluida la creación de archivos y la delegación a subagentes.
+
+| Capacidades | Claude Code (`.claude/agents/`) | Antigravity (`.agents/agents/`) | OpenCode (`.opencode/agents/`) | Copilot (`.github/agents/`) |
+|---|---|---|---|---|
+| Completo (`edit` + `terminal`) | se omite `tools` (hereda todo, incl. `Agent`) | `readonly: false`, sin `tools` | sin mapa `tools` (todo habilitado) | `read, search, edit, execute` |
+| Parcial (p. ej. `edit` sin `terminal`) | `tools: Read, Grep, Glob, Write, Edit` | `readonly: false`, sin `tools` | `tools: {bash: false}` | `read, search, edit` |
+| Solo lectura (sin `edit` ni `terminal`) | `tools: Read, Grep, Glob` | `readonly: true` | `tools: {write: false, edit: false, patch: false, bash: false}` | `read, search` |
+| `delegate` | nativo vía `Agent` heredado | herramientas nativas de subagentes (heredadas) | `task` nativo (heredado) | agrega `agent` |
+
+> Antigravity nunca recibe una lista `tools`: sus nombres de herramientas dependen de la versión y una lista restrictiva elimina silenciosamente la escritura y la delegación. En OpenCode, `tools` siempre es un mapa de booleanos, nunca una lista.
+
+Los agentes que declaran `delegate` (`orchestrator`, `delivery`) deben incluir una sección `## Delegation Fallback`: si el harness no puede crear subagentes, el rol se ejecuta en la misma sesión y registra `mode: delegated | inline | blocked` en `state.yaml#execution_log`.
+
+Ejemplo a partir de `agents/reviewer.md` (`read`, `search`, `terminal`) proyectado en `.opencode/agents/reviewer.md`:
 ```yaml
 ---
 name: reviewer
 description: "Clean-session two-pass deterministic 4R code auditor and adversarial false-positive refuter..."
 mode: all
+tools:
+  write: false
+  edit: false
+  patch: false
 ---
 ```
 
@@ -77,7 +99,7 @@ Para evitar conflictos de nombres en VS Code y habilitar las capacidades de lect
 ---
 name: aff-reviewer
 description: "Clean-session two-pass deterministic 4R code auditor and adversarial false-positive refuter..."
-tools: ['read', 'search', 'edit', 'execute']
+tools: ['read', 'search', 'execute']
 ---
 ```
 Antes de regenerar, el proyector limpia cualquier `aff-*.agent.md` obsoleto respetando posibles agentes externos que no usen el prefijo `aff-`.
