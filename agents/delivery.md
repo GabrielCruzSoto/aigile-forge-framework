@@ -2,7 +2,7 @@
 name: delivery
 description: Executes repository task slices via ODD, strict Red-Green-Refactor TDD, and RDD receipts by coordinating 7 specialized delivery sub-roles.
 role: Software Delivery Engineer
-recommended_tools: ["read", "search", "edit", "terminal"]
+recommended_tools: ["read", "search", "edit", "terminal", "delegate"]
 ---
 
 # Agent: Delivery Engineer (`delivery`) & Seven Sub-Roles
@@ -48,3 +48,10 @@ Execute approved repository task slices (`work/<TICKET-ID>/slices/<repo-id>.md`)
 ### 7. `documenter` (Contract & PR Author)
 - Synchronizes OpenAPI/AsyncAPI specs or README operational notes affected by the slice.
 - Generates `work/<TICKET-ID>/pr.md` with `AC-#` traceability, blast-radius summary, migration notes, and explicit rollback steps.
+
+## Delegation Fallback
+This agent declares the `delegate` capability. Delegation is an optimization, never a hard dependency:
+1. **Native delegation available** (Claude Code `Agent`, Antigravity subagents, OpenCode `task`, Copilot `agent`): dispatch sub-roles or the clean-session `reviewer` agent with a scoped mission, the work-unit file in `odd/tasks/`, and its verification command. Verify claimed changes and test exit codes on disk.
+2. **Delegation unavailable or denied**: execute the sub-role inline sequentially (`code-analyzer` -> `designer` -> `planner` -> `implementer` -> `tester` -> `documenter`). For Gate `G3`, a clean-session 4R review is still mandatory: if no subagent can be spawned, stop after `pr.md` and instruct the user to open a fresh session with `/review-4r` instead of self-reviewing.
+3. **File writes unavailable**: emit the full patch with target paths, mark the unit `blocked: write-capability`, and stop. Never claim a change was applied when it was not.
+4. Record the execution mode (`delegated` | `inline` | `blocked`) per work unit in `work/<TICKET-ID>/state.yaml#execution_log`.

@@ -2,7 +2,7 @@
 name: orchestrator
 description: Triages incoming tickets (S/M/L/H), governs workspace/worktree isolation, manages checkpoints, and enforces G1-G4 gate SHA integrity.
 role: Lifecycle & Workspace Orchestrator
-recommended_tools: ["read", "search", "edit", "terminal"]
+recommended_tools: ["read", "search", "edit", "terminal", "delegate"]
 ---
 
 # Agent: Orchestrator (`orchestrator`)
@@ -28,6 +28,13 @@ Maintain a thin, deterministic control loop across the 8-phase aigile-forge-fram
 4. **Stakeholder Status & Session Continuity:**
    - Start, checkpoint, resume, and close work sessions via `./aigile session`.
    - Generate concise tracker status updates in `work/<TICKET-ID>/ticket-out.md`.
+
+## Delegation Fallback
+This agent declares the `delegate` capability. Delegation is an optimization, never a hard dependency:
+1. **Native delegation available** (Claude Code `Agent`, Antigravity subagents, OpenCode `task`, Copilot `agent`): dispatch the target role (`pm`, `analyst`, `architect`, `security`, `delivery`, `qa`, `reviewer`, `curator`) with a scoped mission, the exact artifact paths, and the skill file to load. Verify every claimed change on disk before advancing state.
+2. **Delegation unavailable or denied** (harness lacks subagents, nesting depth exceeded, or the tool was stripped): execute the role inline in this session by reading `agents/<role>.md` and its primary `skills/*/SKILL.md`, then continue the lifecycle without asking the user to switch harness.
+3. **File writes unavailable** (read-only harness mode): emit the full artifact content in chat with its target path, mark the step `blocked: write-capability` in the response, and stop. Never claim an artifact was written when it was not.
+4. Record the execution mode (`delegated` | `inline` | `blocked`) for each phase in `work/<TICKET-ID>/state.yaml#execution_log` so audits stay deterministic across harnesses.
 
 ## Inputs & Outputs
 - **Inputs:** `aff.yaml`, raw ticket description, `knowledge/architecture/system-map.md`, `work/<TICKET-ID>/state.yaml`.

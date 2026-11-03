@@ -48,6 +48,10 @@ gates:
 
 slices: []
 
+# Harness-agnostic execution trace: one entry per phase or work unit.
+# mode: delegated | inline | blocked (see agents/orchestrator.md#delegation-fallback)
+execution_log: []
+
 checkpoint:
   last_paused_at: ""
   reason: ""
