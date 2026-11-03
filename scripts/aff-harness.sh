@@ -363,83 +363,118 @@ def infer_apply_to(profile_slug: str) -> str:
     return "**/*"
 
 
-def parse_recommended_tools(meta: dict) -> list[str]:
-    raw = meta.get("recommended_tools") or meta.get("tools") or ""
+# ------------------------------------------------------------------------------
+# Capability model (Ports & Adapters)
+# Canonical agents declare abstract capabilities; each harness adapter translates
+# them into its native schema. Golden rule: an allowlist is only emitted to
+# RESTRICT an agent, never to enable it. Agents holding every write-class
+# capability inherit the harness-native toolset (including delegation tools).
+# ------------------------------------------------------------------------------
+CAPABILITY_VOCAB = ("read", "search", "edit", "terminal", "delegate")
+CAPABILITY_ALIASES = {
+    "write": "edit",
+    "execute": "terminal",
+    "exec": "terminal",
+    "bash": "terminal",
+    "shell": "terminal",
+    "agent": "delegate",
+    "subagent": "delegate",
+    "task": "delegate",
+}
+DEFAULT_CAPABILITIES = ["read", "search", "edit", "terminal"]
+
+
+def _raw_capability_tokens(meta: dict) -> list[str]:
+    raw = meta.get("capabilities") or meta.get("recommended_tools") or meta.get("tools") or ""
     if not raw:
-        return ["read", "search", "edit", "terminal"]
+        return []
     if isinstance(raw, list):
-        return [str(x).strip().strip("\"'") for x in raw]
+        return [str(x).strip().strip("\"'").lower() for x in raw if str(x).strip()]
     try:
         loaded = json.loads(raw)
         if isinstance(loaded, list):
-            return [str(x).strip().strip("\"'") for x in loaded]
+            return [str(x).strip().strip("\"'").lower() for x in loaded if str(x).strip()]
     except Exception:
         pass
-    items = re.findall(r'[a-zA-Z0-9_-]+', str(raw))
-    return items if items else ["read", "search", "edit", "terminal"]
+    return [t.lower() for t in re.findall(r"[a-zA-Z0-9_-]+", str(raw))]
 
 
-def build_claude_tools(rec_tools: list[str]) -> str:
-    tools = []
-    if "terminal" in rec_tools:
-        tools.append("Bash")
-    if "edit" in rec_tools:
-        tools.append("Edit")
-    if "read" in rec_tools:
+def unknown_capabilities(meta: dict) -> list[str]:
+    return [
+        t for t in _raw_capability_tokens(meta)
+        if CAPABILITY_ALIASES.get(t, t) not in CAPABILITY_VOCAB
+    ]
+
+
+def parse_recommended_tools(meta: dict) -> list[str]:
+    tokens = _raw_capability_tokens(meta)
+    if not tokens:
+        return list(DEFAULT_CAPABILITIES)
+    caps: list[str] = []
+    for tok in tokens:
+        cap = CAPABILITY_ALIASES.get(tok, tok)
+        if cap in CAPABILITY_VOCAB and cap not in caps:
+            caps.append(cap)
+    return caps if caps else list(DEFAULT_CAPABILITIES)
+
+
+def is_full_writer(caps: list[str]) -> bool:
+    return "edit" in caps and "terminal" in caps
+
+
+def build_claude_tools(caps: list[str]) -> "str | None":
+    """Claude Code: omitting `tools` inherits every tool (Write, Agent, MCP...)."""
+    if is_full_writer(caps):
+        return None
+    tools: list[str] = []
+    if "read" in caps:
         tools.append("Read")
-    if "search" in rec_tools:
+    if "search" in caps:
         tools.extend(["Grep", "Glob"])
+    if "edit" in caps:
+        tools.extend(["Write", "Edit"])
+    if "terminal" in caps:
+        tools.append("Bash")
+    if "delegate" in caps:
+        tools.append("Agent")
     if not tools:
         tools = ["Read", "Grep", "Glob"]
     return ", ".join(tools)
 
 
-def build_antigravity_tools(rec_tools: list[str]) -> tuple[bool, list[str]]:
-    has_write = "edit" in rec_tools
-    has_exec = "terminal" in rec_tools
-    is_readonly = not (has_write or has_exec)
+def build_antigravity_tools(caps: list[str]) -> bool:
+    """Antigravity: `tools` is a strict allowlist with version-dependent names.
 
-    ag_tools = []
-    if has_exec:
-        ag_tools.append("run_command")
-    if has_write:
-        ag_tools.extend(["write_file", "edit_file"])
-    if "read" in rec_tools:
-        ag_tools.append("read_file")
-    if "search" in rec_tools:
-        ag_tools.append("search_web")
-    if has_exec:
-        ag_tools.append("manage_task")
-    ag_tools.extend(["ask_question", "schedule"])
-
-    seen = set()
-    deduped = [t for t in ag_tools if not (t in seen or seen.add(t))]
-    return is_readonly, deduped
+    Never emit it; rely solely on the native `readonly` flag. Returns readonly.
+    """
+    return not ("edit" in caps or "terminal" in caps)
 
 
-def build_opencode_tools(rec_tools: list[str]) -> list[str]:
-    oc_tools = []
-    if "read" in rec_tools:
-        oc_tools.append("read")
-    if "search" in rec_tools:
-        oc_tools.append("search")
-    if "edit" in rec_tools:
-        oc_tools.extend(["write", "edit"])
-    if "terminal" in rec_tools:
-        oc_tools.append("bash")
-    return oc_tools if oc_tools else ["read"]
+def build_opencode_tools(caps: list[str]) -> dict[str, bool]:
+    """OpenCode: `tools` is a boolean map; every tool is enabled by default.
+
+    Only emit disabled entries, so unknown/new native tools stay available.
+    """
+    disabled: dict[str, bool] = {}
+    if "edit" not in caps:
+        disabled.update({"write": False, "edit": False, "patch": False})
+    if "terminal" not in caps:
+        disabled["bash"] = False
+    return disabled
 
 
-def build_copilot_tools(rec_tools: list[str]) -> list[str]:
+def build_copilot_tools(caps: list[str]) -> list[str]:
     gh_tools = []
-    if "read" in rec_tools:
+    if "read" in caps:
         gh_tools.append("read")
-    if "search" in rec_tools:
+    if "search" in caps:
         gh_tools.append("search")
-    if "edit" in rec_tools:
+    if "edit" in caps:
         gh_tools.append("edit")
-    if "terminal" in rec_tools:
+    if "terminal" in caps:
         gh_tools.append("execute")
+    if "delegate" in caps:
+        gh_tools.append("agent")
     return gh_tools if gh_tools else ["read"]
 
 
@@ -464,11 +499,12 @@ def sync_claude_agents() -> int:
         desc_escaped = desc.replace('"', '\\"')
         rec_tools = parse_recommended_tools(meta)
         c_tools = build_claude_tools(rec_tools)
+        tools_line = f"tools: {c_tools}\n" if c_tools else ""
         rendered = (
             "---\n"
             f"name: {slug}\n"
             f'description: "{desc_escaped}"\n'
-            f"tools: {c_tools}\n"
+            f"{tools_line}"
             "---\n\n"
             + body.lstrip("\r\n").rstrip()
             + "\n"
@@ -499,15 +535,12 @@ def sync_antigravity_agents() -> int:
             desc = m_role.group(1).strip() if m_role else slug.replace("-", " ").title()
         desc_escaped = desc.replace('"', '\\"')
         rec_tools = parse_recommended_tools(meta)
-        is_readonly, ag_tools = build_antigravity_tools(rec_tools)
-        tools_lines = "\n".join(f"  - {t}" for t in ag_tools)
+        is_readonly = build_antigravity_tools(rec_tools)
         rendered = (
             "---\n"
             f"name: {slug}\n"
             f'description: "{desc_escaped}"\n'
             f"readonly: {'true' if is_readonly else 'false'}\n"
-            "tools:\n"
-            f"{tools_lines}\n"
             "---\n\n"
             + body.lstrip("\r\n").rstrip()
             + "\n"
@@ -541,15 +574,17 @@ def sync_opencode_agents() -> int:
             desc = m_role.group(1).strip() if m_role else slug.replace("-", " ").title()
         desc_escaped = desc.replace('"', '\\"')
         rec_tools = parse_recommended_tools(meta)
-        oc_tools = build_opencode_tools(rec_tools)
-        tools_lines = "\n".join(f"  - {t}" for t in oc_tools)
+        oc_disabled = build_opencode_tools(rec_tools)
+        tools_block = (
+            "tools:\n" + "".join(f"  {k}: false\n" for k in oc_disabled)
+            if oc_disabled else ""
+        )
         rendered = (
             "---\n"
             f"name: {slug}\n"
             f'description: "{desc_escaped}"\n'
             "mode: all\n"
-            "tools:\n"
-            f"{tools_lines}\n"
+            f"{tools_block}"
             "---\n\n"
             + body.lstrip("\r\n").rstrip()
             + "\n"
@@ -995,6 +1030,60 @@ if action == "check":
                     errors.append("opencode.json 'mcp' block must be empty {} in 'zero-mcp' mode")
             except Exception:
                 pass
+
+    # Capability model: canonical tokens + per-harness projection contracts.
+    canonical_caps: dict[str, list[str]] = {}
+    agents_root = target_dir / "agents"
+    if agents_root.is_dir():
+        for amd in sorted(agents_root.glob("*.md")):
+            if amd.name.lower() == "readme.md":
+                continue
+            ameta, _, abody = split_frontmatter(amd.read_text(encoding="utf-8", errors="replace"))
+            aslug = ameta.get("name") or amd.stem
+            bad = unknown_capabilities(ameta)
+            if bad:
+                errors.append(
+                    f"agents/{amd.name}: unknown capability token(s) {bad}; "
+                    f"allowed: {list(CAPABILITY_VOCAB)}"
+                )
+            acaps = parse_recommended_tools(ameta)
+            canonical_caps[aslug] = acaps
+            if "delegate" in acaps and "## Delegation Fallback" not in abody:
+                errors.append(
+                    f"agents/{amd.name}: declares 'delegate' but lacks a '## Delegation Fallback' "
+                    "section (required for harnesses without subagent support)"
+                )
+
+    def _projected_fm(path: Path) -> str:
+        _, fm, _ = split_frontmatter(path.read_text(encoding="utf-8", errors="replace"))
+        return fm
+
+    for aslug, acaps in canonical_caps.items():
+        c_file = target_dir / ".claude" / "agents" / f"{aslug}.md"
+        if c_file.is_file():
+            fm = _projected_fm(c_file)
+            m_tools = re.search(r"^tools:\s*(.+)$", fm, re.M)
+            if is_full_writer(acaps) and m_tools:
+                errors.append(
+                    f".claude/agents/{aslug}.md: full-capability agent must not restrict 'tools' "
+                    "(re-run ./aigile harness sync claude)"
+                )
+            if m_tools and "edit" in acaps and "Write" not in m_tools.group(1):
+                errors.append(f".claude/agents/{aslug}.md: 'edit' capability projected without Write tool")
+        ag_file = target_dir / ".agents" / "agents" / f"{aslug}.md"
+        if ag_file.is_file() and re.search(r"^tools:", _projected_fm(ag_file), re.M):
+            errors.append(
+                f".agents/agents/{aslug}.md: Antigravity 'tools' allowlist is forbidden "
+                "(version-dependent names strip write/delegation tools); re-run ./aigile harness sync antigravity"
+            )
+        oc_file_agent = target_dir / ".opencode" / "agents" / f"{aslug}.md"
+        if oc_file_agent.is_file():
+            fm = _projected_fm(oc_file_agent)
+            if re.search(r"^tools:\s*\r?\n\s+-\s", fm, re.M):
+                errors.append(
+                    f".opencode/agents/{aslug}.md: 'tools' must be a boolean map, not a list "
+                    "(re-run ./aigile harness sync opencode)"
+                )
 
     for w in warnings:
         print(f"  [WARN] {w}")
