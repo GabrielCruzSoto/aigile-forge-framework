@@ -161,6 +161,70 @@ fi
 "$COPY_REPO/aigile" harness check >"$SCRATCH_ROOT/check-zero.log" 2>&1
 pass "aigile harness check passed in zero-mcp mode"
 
+# ------------------------------------------------------------------------------
+# S2b: Per-harness agent capability contracts (Claude Code / Antigravity / OpenCode / Copilot)
+# Allowlists may only restrict; full-capability agents must keep write + delegation.
+# ------------------------------------------------------------------------------
+echo ""
+echo "--- [S2b] Cross-Harness Agent Capability Contracts ---"
+CONTRACT_OUT="$(python3 - "$COPY_REPO" <<'PY'
+import re, sys
+from pathlib import Path
+root = Path(sys.argv[1])
+
+def fm(path):
+    m = re.match(r"^---\r?\n(.*?)\r?\n---", path.read_text(encoding="utf-8"), re.S)
+    return m.group(1) if m else ""
+
+def check(ok, label):
+    print(("PASS " if ok else "FAIL ") + label)
+
+orch_c = fm(root / ".claude/agents/orchestrator.md")
+check(not re.search(r"^tools:", orch_c, re.M), "claude: orchestrator inherits full toolset (no tools restriction)")
+analyst_c = fm(root / ".claude/agents/analyst.md")
+check(re.search(r"^tools:.*\bWrite\b", analyst_c, re.M) is not None, "claude: edit-capable restricted agent includes Write")
+reviewer_c = fm(root / ".claude/agents/reviewer.md")
+check(re.search(r"^tools:", reviewer_c, re.M) is not None and "Write" not in reviewer_c, "claude: reviewer stays restricted without Write")
+
+for slug in ("orchestrator", "delivery", "reviewer"):
+    ag = fm(root / f".agents/agents/{slug}.md")
+    check(not re.search(r"^tools:", ag, re.M), f"antigravity: {slug} has no brittle tools allowlist")
+    check("readonly: false" in ag, f"antigravity: {slug} is not readonly")
+
+orch_o = fm(root / ".opencode/agents/orchestrator.md")
+check(not re.search(r"^tools:", orch_o, re.M), "opencode: orchestrator keeps every native tool enabled")
+rev_o = fm(root / ".opencode/agents/reviewer.md")
+check(re.search(r"^tools:\s*\n\s+write: false", rev_o, re.M) is not None, "opencode: reviewer tools is a boolean map disabling write")
+check(not re.search(r"^tools:\s*\n\s+-\s", rev_o, re.M), "opencode: tools is never emitted as a list")
+
+orch_g = fm(root / ".github/agents/aff-orchestrator.agent.md")
+check('"agent"' in orch_g and '"edit"' in orch_g, "copilot: orchestrator has edit + agent (delegation) tools")
+PY
+)"
+while IFS= read -r line; do
+    case "$line" in
+        "PASS "*) pass "${line#PASS }" ;;
+        "FAIL "*) fail "${line#FAIL }" ;;
+    esac
+done <<< "$CONTRACT_OUT"
+
+# Negative test: harness check must reject a hand-edited Antigravity allowlist
+NEG_AG="$COPY_REPO/.agents/agents/orchestrator.md"
+cp "$NEG_AG" "$SCRATCH_ROOT/orchestrator.ag.bak"
+python3 - "$NEG_AG" <<'PY'
+import sys
+p = sys.argv[1]
+s = open(p, encoding="utf-8").read()
+s = s.replace("readonly: false\n", "readonly: false\ntools:\n  - read_file\n", 1)
+open(p, "w", encoding="utf-8").write(s)
+PY
+if "$COPY_REPO/aigile" harness check >/dev/null 2>&1; then
+    fail "aigile harness check accepted a restrictive Antigravity tools allowlist"
+else
+    pass "aigile harness check rejects a restrictive Antigravity tools allowlist"
+fi
+cp "$SCRATCH_ROOT/orchestrator.ag.bak" "$NEG_AG"
+
 # Now test Full-MCP projection
 "$COPY_REPO/aigile" harness sync all --copy --mode mcp >"$SCRATCH_ROOT/sync-mcp.log" 2>&1
 if [ -f "$COPY_REPO/.mcp.json" ] && [ -f "$COPY_REPO/.agents/mcp_config.json" ]; then
