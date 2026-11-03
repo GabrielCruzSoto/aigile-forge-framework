@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-AFF_VERSION="1.0.0"
+AFF_VERSION="1.1.0"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 
