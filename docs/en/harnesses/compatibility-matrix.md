@@ -11,11 +11,11 @@
 
 | Canonical Source | Claude Code (`claude`) | OpenCode (`opencode`) | Google Antigravity (`antigravity`) | OpenAI Codex (`codex`) | GitHub Copilot (`copilot`) |
 |---|---|---|---|---|---|
-| `AGENTS.md` + `aff.yaml` | `CLAUDE.md` *(imports `@AGENTS.md`)* | `AGENTS.md` *(native)* | `AGENTS.md` *(native)* | `AGENTS.md` *(native)* | `.github/copilot-instructions.md` *(synthesized from `aff.yaml`)* |
-| `agents/*.md` *(10 roles)* | `.claude/agents/<slug>.md` | `.opencode/agents/<slug>.md` & `.agents/agents/<slug>.md` | `.agents/agents/<slug>.md` | `.agents/agents/<slug>.md` | `.github/agents/aff-<slug>.agent.md` |
+| `AGENTS.md` + `aff.yaml` | `CLAUDE.md` *(imports `@AGENTS.md`)* | `AGENTS.md` *(native)* | `AGENTS.md` + `.agents/rules/antigravity-runtime.md` | `AGENTS.md` *(native)* | `.github/copilot-instructions.md` *(synthesized from `aff.yaml`)* |
+| `agents/*.md` *(10 roles)* | `.claude/agents/<slug>.md` | `.opencode/agents/<slug>.md` & `.agents/agents/<slug>.md` | `.agents/agents/<slug>.md` + dynamic subagents (`define_subagent`) | `.agents/agents/<slug>.md` | `.github/agents/aff-<slug>.agent.md` |
 | `skills/*/SKILL.md` *(19 bundles)* | `.claude/skills/` *(link or copy)* | `.agents/skills/` *(link or copy)* | `.agents/skills/` *(link or copy)* | `.agents/skills/` *(link or copy)* | `.github/skills/` *(link or copy)* |
 | `profiles/*.md` *(enabled in `aff.yaml`)* | Referenced via `AGENTS.md` + `profiles/*.md` | Referenced via `AGENTS.md` + `profiles/*.md` | Referenced via `AGENTS.md` + `profiles/*.md` | Referenced via `AGENTS.md` + `profiles/*.md` | `.github/instructions/<slug>.instructions.md` |
-| `prompts/*.prompt.md` *(9 slash flows)* | `.claude/commands/<name>.md` *(native `/command`)* | `.opencode/prompts/` & `.agents/skills/<name>/` | `.agents/workflows/<name>.md` & `.agents/skills/<name>/` | `.agents/skills/<name>/` | `.github/prompts/<name>.prompt.md` *(native `/command`)* |
+| `prompts/*.prompt.md` *(9 slash flows)* | `.claude/commands/<name>.md` *(native `/command`)* | `.opencode/prompts/` & `.agents/skills/<name>/` | `.agents/skills/<name>/` *(native `/command`)* & `.agents/workflows/` *(deprecated)* | `.agents/skills/<name>/` | `.github/prompts/<name>.prompt.md` *(native `/command`)* |
 | `mcp/*.json` *(when `mode == "mcp"`)* | `.mcp.json` (`mcpServers`, `type: "stdio"`) | `opencode.json` (`mcp`, `type: "local"`) | `.agents/mcp_config.json` (`mcpServers`) | Local CLI / `AGENTS.md` | Declarative IDE native *(no MCP file)* |
 | `mcp/*.json` *(when `mode == "zero-mcp"`)* | `.mcp.json` **removed / omitted** | `opencode.json` with `"mcp": {}` | `.agents/mcp_config.json` **removed / omitted** | None | None |
 

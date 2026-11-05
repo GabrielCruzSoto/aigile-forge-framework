@@ -14,7 +14,7 @@ aigile-forge-framework unifies CLI/agentic harnesses and IDE-native assistants a
 |---|---|---|---|---|
 | **Claude Code** | `CLAUDE.md` (`@AGENTS.md`) | `.claude/agents/*.md` + `.claude/commands/*.md` | `.claude/skills/` | `.mcp.json` |
 | **OpenCode** | `AGENTS.md` | `.opencode/agents/*.md` + `.opencode/prompts/*.prompt.md` | `.agents/skills/` (incl. slash prompts) | `opencode.json` |
-| **Antigravity** | `AGENTS.md` | `.agents/agents/*.md` + `.agents/workflows/*.md` | `.agents/skills/` (incl. slash prompts) | `.agents/mcp_config.json` |
+| **Antigravity** | `AGENTS.md` + `.agents/rules/*.md` | `.agents/skills/` (slash prompts as native skills) + runtime subagents | `.agents/skills/` (incl. slash prompts) | `.agents/mcp_config.json` |
 | **Codex** | `AGENTS.md` | `agents/*.md` | `.agents/skills/` (incl. slash prompts) | `configs/harnesses.json` / MCP env |
 | **GitHub Copilot** | `.github/copilot-instructions.md` + `.github/instructions/*.instructions.md` | `.github/agents/aff-*.agent.md` + `.github/prompts/*.prompt.md` | `.github/skills/` | Zero-MCP native (IDE declarative) |
 
@@ -64,6 +64,18 @@ Teams select the isolation topology that matches their repository architecture:
 5. **`tester`:** Runs unit, integration, contract, and idempotency test suites locally, capturing deterministic exit codes and outputs.
 6. **`reviewer`:** Triggers or delegates to the clean-session `reviewer` agent for two-pass 4R auditing + adversarial refutation before opening or approving a PR.
 7. **`documenter`:** Updates OpenAPI/AsyncAPI schemas, authors traceable pull request descriptions (`pr.md`), and documents release and rollback procedures.
+
+### 3.3 Antigravity Dynamic Delegation & Permissions Protocol
+
+Google Antigravity manages subagents dynamically in memory via platform APIs (`define_subagent` and `invoke_subagent`) rather than discovering static Markdown files from disk. To ensure operational integrity:
+
+1. **Orchestrator Execution Rights:** The Antigravity `orchestrator` is a *Lifecycle & Workspace Orchestrator* with full terminal and write access (`EnableWriteTools: true`). It directly executes `./aigile worktree`, `./aigile session`, Git operations, and manages `work/<TICKET-ID>/state.yaml`. It must never run in read-only mode.
+2. **Subagent Tool Grants:**
+   - Roles executing code modifications, documentation updates, or test suites (`delivery`, `qa`, `orchestrator`, `analyst`, `architect`, `curator`, `onboarding`, and command-verifying `reviewer`/`security`) require `EnableWriteTools: true`.
+   - Connected environments (`harnesses.mode: "mcp"`) grant `EnableMCPTools: true` for Engram, CodeGraph, Google Drive, and NotebookLM.
+   - Nested subagent delegation (`EnableSubagentTools: true`) is reserved for orchestrator-level duties and capped at 10 levels deep.
+3. **Slash Commands as Native Skills:** Antigravity slash prompts (`/aff-intake`, `/elicit-ticket`, `/contract-first`, `/work-units`, `/review-4r`) are projected as native skills under `.agents/skills/<name>/SKILL.md`. Legacy `.agents/workflows/` files are maintained as backward-compatible mirrors.
+4. **Resilient Inline Fallback:** When subagent delegation is unavailable or denied, the session continues inline by loading `agents/<role>.md` and target skills directly without blocking.
 
 ---
 

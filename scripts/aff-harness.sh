@@ -460,6 +460,8 @@ def build_opencode_tools(caps: list[str]) -> dict[str, bool]:
         disabled.update({"write": False, "edit": False, "patch": False})
     if "terminal" not in caps:
         disabled["bash"] = False
+    if "delegate" not in caps:
+        disabled["task"] = False
     return disabled
 
 
@@ -552,6 +554,41 @@ def sync_antigravity_agents() -> int:
         count += 1
     print(f"  [OK] Projected {count} agent(s) -> .agents/agents")
     return count
+
+
+def sync_antigravity_rules() -> int:
+    rules_dir = target_dir / ".agents" / "rules"
+    rules_dir.mkdir(parents=True, exist_ok=True)
+    rule_file = rules_dir / "antigravity-runtime.md"
+    rule_content = """# Antigravity Runtime & Orchestration Rule
+
+> Canonical reference: see [`AGENTS.md`](../../AGENTS.md) at the workspace root.
+> Generated deterministically by `./aigile harness sync antigravity`.
+
+## 1. Orchestrator Role & Tool Permissions
+- The `orchestrator` agent in Antigravity is a **Lifecycle & Workspace Orchestrator**, responsible for ticket intake, worktree isolation, session continuity, and cryptographic human gate verification (`G1`–`G4`).
+- The `orchestrator` must maintain active terminal execution and file write capabilities (`run_command`, `write_file`, `edit_file`) to execute `./aigile worktree`, `./aigile session`, Git operations, and maintain `work/<TICKET-ID>/state.yaml`.
+- Never strip or deny write permissions from the orchestrator. It is not an advisory-only planner.
+
+## 2. Dynamic Subagent Delegation Protocol
+- Antigravity manages subagents dynamically in memory via `define_subagent` and `invoke_subagent`. Static markdown files under `.agents/agents/` serve as specification baselines, not auto-loaded workers.
+- When delegating to sub-roles (`delivery`, `qa`, `analyst`, `architect`, `security`, `reviewer`, `curator`):
+  1. Load role prompt from `agents/<role>.md` and primary skill from `skills/*/SKILL.md`.
+  2. Call `define_subagent`:
+     - Set `EnableWriteTools: true` for roles that perform code edits, create documentation, or execute verification commands (`delivery`, `qa`, `orchestrator`, `analyst`, `architect`, `curator`, `onboarding`, and for `reviewer`/`security` when running test/audit commands).
+     - Set `EnableMCPTools: true` when `harnesses.mode` is `"mcp"` (for Engram, CodeGraph, Drive, NotebookLM).
+     - Set `EnableSubagentTools: false` unless nested subagent delegation is explicitly required (max depth <= 10).
+  3. Call `invoke_subagent` with the defined subagent name, scoped task instructions, and workspace path.
+  4. Verify returned changes and test exit codes on disk before advancing `state.yaml` gates.
+- **Inline Fallback**: If subagent delegation is unavailable, denied, or max nesting depth is reached, execute the role inline in the current session without failing or asking the user to change harness.
+
+## 3. Skills as Native Slash Commands
+- All workflow slash prompts (`/aff-intake`, `/elicit-ticket`, `/answers-to-spec`, `/contract-first`, `/parity-check`, `/work-units`, `/review-4r`, `/review-refuter`, `/init-team`) are migrated to first-class skills under `.agents/skills/<name>/SKILL.md`.
+- Invoke slash commands directly via `/<name>` in the chat interface.
+"""
+    rule_file.write_text(rule_content, encoding="utf-8")
+    print("  [OK] Generated .agents/rules/antigravity-runtime.md")
+    return 1
 
 
 def sync_opencode_agents() -> int:
@@ -741,9 +778,19 @@ def sync_antigravity_workflows() -> int:
     count = 0
     for prfile in sorted(src_prompts.glob("*.prompt.md")):
         slug = prfile.name[:-len(".prompt.md")] if prfile.name.endswith(".prompt.md") else prfile.stem
-        shutil.copy2(prfile, ag_wf_dir / f"{slug}.md")
+        raw_text = prfile.read_text(encoding="utf-8", errors="replace")
+        meta, fm, body = split_frontmatter(raw_text)
+        rendered = (
+            "---\n"
+            + fm.strip()
+            + "\n---\n\n"
+            + f"> [!NOTE]\n> **Deprecated workflow format:** This workflow is migrated to a native skill at `.agents/skills/{slug}/SKILL.md`.\n> Prefer invoking `/{slug}` as a native skill.\n\n"
+            + body.lstrip("\r\n").rstrip()
+            + "\n"
+        )
+        (ag_wf_dir / f"{slug}.md").write_text(rendered, encoding="utf-8")
         count += 1
-    print(f"  [OK] Projected {count} workflow(s) -> .agents/workflows/")
+    print(f"  [OK] Projected {count} workflow(s) -> .agents/workflows/ (migrated to .agents/skills/)")
     return count
 
 
@@ -816,7 +863,7 @@ if action == "print":
             "mode": effective_mode,
             "instructions": "AGENTS.md",
             "skills": ".agents/skills",
-            "agents": ".agents/agents",
+            "agents": ".opencode/agents",
             "prompts_dir": ".opencode/prompts",
             "opencode_json": {
                 "$schema": "https://opencode.ai/config.json",
@@ -828,6 +875,7 @@ if action == "print":
             "harness": "antigravity",
             "mode": effective_mode,
             "instructions": "AGENTS.md",
+            "rules_dir": ".agents/rules",
             "skills": ".agents/skills",
             "agents": ".agents/agents",
             "workflows_dir": ".agents/workflows",
@@ -912,6 +960,7 @@ This entry point imports the canonical [`AGENTS.md`](AGENTS.md) contract shared 
         print(f"  [OK] Generated opencode.json (mode: {effective_mode})")
 
     if "antigravity" in targets:
+        sync_antigravity_rules()
         sync_antigravity_workflows()
         ag_mcp_path = target_dir / ".agents" / "mcp_config.json"
         ag_mcp_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1156,6 +1205,7 @@ case "$SUBCOMMAND" in
             ".opencode/agents" \
             ".opencode/prompts" \
             ".agents/skills" \
+            ".agents/rules" \
             ".agents/agents" \
             ".agents/workflows" \
             ".agents/mcp_config.json" \
@@ -1190,7 +1240,7 @@ case "$SUBCOMMAND" in
         echo "==> [aigile-forge-framework:harness] Cleaning generated harness projections in $TARGET_DIR..."
         rm -f "$TARGET_DIR/CLAUDE.md" "$TARGET_DIR/.mcp.json" "$TARGET_DIR/opencode.json"
         rm -rf "$TARGET_DIR/.claude/skills" "$TARGET_DIR/.claude/agents" "$TARGET_DIR/.claude/commands"
-        rm -rf "$TARGET_DIR/.agents/skills" "$TARGET_DIR/.agents/agents" "$TARGET_DIR/.agents/workflows" "$TARGET_DIR/.agents/mcp_config.json"
+        rm -rf "$TARGET_DIR/.agents/skills" "$TARGET_DIR/.agents/rules" "$TARGET_DIR/.agents/agents" "$TARGET_DIR/.agents/workflows" "$TARGET_DIR/.agents/mcp_config.json"
         rm -rf "$TARGET_DIR/.opencode/agents" "$TARGET_DIR/.opencode/prompts"
         rm -f "$TARGET_DIR/.github/copilot-instructions.md"
         rm -rf "$TARGET_DIR/.github/instructions" "$TARGET_DIR/.github/agents" "$TARGET_DIR/.github/prompts" "$TARGET_DIR/.github/skills"

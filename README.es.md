@@ -1,6 +1,6 @@
 # aigile-forge-framework
 
-> **Versión:** `1.1.0` | **Licencia:** [MIT](LICENSE) | **English documentation:** [`README.md`](README.md) | **Portal de documentación:** [`docs/es/index.md`](docs/es/index.md) | **Licencia:** [MIT (`LICENSE`)](LICENSE)
+> **Versión:** `1.1.1` | **Licencia:** [MIT](LICENSE) | **English documentation:** [`README.md`](README.md) | **Portal de documentación:** [`docs/es/index.md`](docs/es/index.md) | **Licencia:** [MIT (`LICENSE`)](LICENSE)
 
 **`aigile-forge-framework`** es un marco universal y declarativo de ingeniería y gobierno asistido por IA para equipos de desarrollo de software. A partir de una única fuente canónica (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/` y `mcp/`), `aigile-forge-framework` proyecta de forma determinista instrucciones operativas, agentes especializados por rol, habilidades procedimentales (`skills`), perfiles tecnológicos y descriptores opcionales de MCP hacia **Claude Code**, **OpenCode**, **Google Antigravity**, **OpenAI Codex** y **GitHub Copilot**.
 

@@ -1,6 +1,6 @@
 # aigile-forge-framework
 
-> **Version:** `1.1.0` | **License:** [MIT](LICENSE) | **Spanish documentation:** [`README.es.md`](README.es.md) | **Documentation Portal:** [`docs/en/index.md`](docs/en/index.md) | **License:** [MIT](LICENSE)
+> **Version:** `1.1.1` | **License:** [MIT](LICENSE) | **Spanish documentation:** [`README.es.md`](README.es.md) | **Documentation Portal:** [`docs/en/index.md`](docs/en/index.md) | **License:** [MIT](LICENSE)
 
 **`aigile-forge-framework`** is an open-source, universal, declarative engineering harness and governance framework for software development teams. From a single canonical source (`aff.yaml`, `AGENTS.md`, `agents/`, `skills/`, `profiles/`, `prompts/`, `templates/`, and `mcp/`), `aigile-forge-framework` deterministically projects instructions, specialist role agents, procedural skills, stack guardrails, and optional MCP descriptors across **Claude Code**, **OpenCode**, **Google Antigravity**, **OpenAI Codex**, and **GitHub Copilot**.
 

@@ -36,6 +36,15 @@ This agent declares the `delegate` capability. Delegation is an optimization, ne
 3. **File writes unavailable** (read-only harness mode): emit the full artifact content in chat with its target path, mark the step `blocked: write-capability` in the response, and stop. Never claim an artifact was written when it was not.
 4. Record the execution mode (`delegated` | `inline` | `blocked`) for each phase in `work/<TICKET-ID>/state.yaml#execution_log` so audits stay deterministic across harnesses.
 
+### Antigravity Dynamic Delegation & Permissions Protocol
+In Google Antigravity, subagents are managed dynamically at runtime via `define_subagent` and `invoke_subagent` rather than loaded from static `.md` files on disk:
+- **Orchestrator Permissions:** The orchestrator in Antigravity is a *Lifecycle & Workspace Orchestrator*. It requires active terminal and write access (`EnableWriteTools: true` / non-readonly) to run `./aigile worktree`, `./aigile session`, Git branch operations, and persist `work/<TICKET-ID>/state.yaml`. It must never be restricted to read-only or advisory mode.
+- **Subagent Permissions:** When defining subagents for specialized delivery roles:
+  - `EnableWriteTools: true` for roles that author code, update documentation, or execute test commands (`delivery`, `qa`, `orchestrator`, `analyst`, `architect`, `curator`, `onboarding`, and `reviewer`/`security` when running command audits).
+  - `EnableMCPTools: true` when `harnesses.mode` is `"mcp"` (for Engram, CodeGraph, Drive, NotebookLM).
+  - `EnableSubagentTools: false` unless nested delegation is specifically required (depth <= 10).
+- **Inline Fallback:** If `define_subagent` or `invoke_subagent` is unavailable or denied, execute the phase inline without halting.
+
 ## Inputs & Outputs
 - **Inputs:** `aff.yaml`, raw ticket description, `knowledge/architecture/system-map.md`, `work/<TICKET-ID>/state.yaml`.
 - **Outputs:** `work/<TICKET-ID>/ticket-in.md`, `work/<TICKET-ID>/state.yaml`, `work/<TICKET-ID>/ticket-out.md`, isolated worktrees.
