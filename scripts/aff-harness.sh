@@ -442,12 +442,19 @@ def build_claude_tools(caps: list[str]) -> "str | None":
     return ", ".join(tools)
 
 
-def build_antigravity_tools(caps: list[str]) -> bool:
-    """Antigravity: `tools` is a strict allowlist with version-dependent names.
-
-    Never emit it; rely solely on the native `readonly` flag. Returns readonly.
-    """
-    return not ("edit" in caps or "terminal" in caps)
+def build_antigravity_tools(caps: list[str]) -> list[str]:
+    """Map canonical capability tokens to native Google Antigravity tool names."""
+    tools: list[str] = ["read_file", "ask_question"]
+    if "search" in caps:
+        tools.append("search_web")
+    if "edit" in caps:
+        tools.extend(["write_file", "edit_file"])
+    if "terminal" in caps:
+        tools.append("run_command")
+    if "delegate" in caps:
+        tools.extend(["define_subagent", "invoke_subagent", "manage_subagents"])
+    tools.extend(["call_mcp_tool", "list_resources", "read_resource", "manage_task", "schedule"])
+    return list(dict.fromkeys(tools))
 
 
 def build_opencode_tools(caps: list[str]) -> dict[str, bool]:
@@ -537,12 +544,21 @@ def sync_antigravity_agents() -> int:
             desc = m_role.group(1).strip() if m_role else slug.replace("-", " ").title()
         desc_escaped = desc.replace('"', '\\"')
         rec_tools = parse_recommended_tools(meta)
-        is_readonly = build_antigravity_tools(rec_tools)
+        is_readonly = not ("edit" in rec_tools or "terminal" in rec_tools)
+        is_main = slug in ("orchestrator", "onboarding")
+        ag_tools = build_antigravity_tools(rec_tools)
+        tools_block = "".join(f"  - {t}\n" for t in ag_tools)
         rendered = (
             "---\n"
             f"name: {slug}\n"
             f'description: "{desc_escaped}"\n'
+            "model: inherit\n"
             f"readonly: {'true' if is_readonly else 'false'}\n"
+            f"mainAgent: {'true' if is_main else 'false'}\n"
+            "subagent: true\n"
+            "inheritMcp: true\n"
+            "tools:\n"
+            f"{tools_block}"
             "---\n\n"
             + body.lstrip("\r\n").rstrip()
             + "\n"
@@ -1120,11 +1136,14 @@ if action == "check":
             if m_tools and "edit" in acaps and "Write" not in m_tools.group(1):
                 errors.append(f".claude/agents/{aslug}.md: 'edit' capability projected without Write tool")
         ag_file = target_dir / ".agents" / "agents" / f"{aslug}.md"
-        if ag_file.is_file() and re.search(r"^tools:", _projected_fm(ag_file), re.M):
-            errors.append(
-                f".agents/agents/{aslug}.md: Antigravity 'tools' allowlist is forbidden "
-                "(version-dependent names strip write/delegation tools); re-run ./aigile harness sync antigravity"
-            )
+        if ag_file.is_file():
+            ag_fm = _projected_fm(ag_file)
+            if not re.search(r"^tools:\s*\r?\n\s+-\s", ag_fm, re.M):
+                errors.append(f".agents/agents/{aslug}.md: Antigravity agent missing native 'tools' list (re-run ./aigile harness sync antigravity)")
+            if is_full_writer(acaps):
+                for req_tool in ("run_command", "write_file", "edit_file"):
+                    if f"- {req_tool}" not in ag_fm:
+                        errors.append(f".agents/agents/{aslug}.md: full-capability Antigravity agent missing '{req_tool}'")
         oc_file_agent = target_dir / ".opencode" / "agents" / f"{aslug}.md"
         if oc_file_agent.is_file():
             fm = _projected_fm(oc_file_agent)

@@ -188,8 +188,11 @@ check(re.search(r"^tools:", reviewer_c, re.M) is not None and "Write" not in rev
 
 for slug in ("orchestrator", "delivery", "reviewer"):
     ag = fm(root / f".agents/agents/{slug}.md")
-    check(not re.search(r"^tools:", ag, re.M), f"antigravity: {slug} has no brittle tools allowlist")
+    check(re.search(r"^tools:\s*\r?\n\s+-\s", ag, re.M) is not None, f"antigravity: {slug} has native tools list")
     check("readonly: false" in ag, f"antigravity: {slug} is not readonly")
+
+ag_orch = fm(root / ".agents/agents/orchestrator.md")
+check("mainAgent: true" in ag_orch and "run_command" in ag_orch and "write_file" in ag_orch, "antigravity: orchestrator has mainAgent and full write tools")
 
 orch_o = fm(root / ".opencode/agents/orchestrator.md")
 check(not re.search(r"^tools:", orch_o, re.M), "opencode: orchestrator keeps every native tool enabled")
@@ -208,20 +211,20 @@ while IFS= read -r line; do
     esac
 done <<< "$CONTRACT_OUT"
 
-# Negative test: harness check must reject a hand-edited Antigravity allowlist
+# Negative test: harness check must reject if orchestrator is stripped of write_file
 NEG_AG="$COPY_REPO/.agents/agents/orchestrator.md"
 cp "$NEG_AG" "$SCRATCH_ROOT/orchestrator.ag.bak"
 python3 - "$NEG_AG" <<'PY'
 import sys
 p = sys.argv[1]
 s = open(p, encoding="utf-8").read()
-s = s.replace("readonly: false\n", "readonly: false\ntools:\n  - read_file\n", 1)
+s = s.replace("  - write_file\n", "", 1)
 open(p, "w", encoding="utf-8").write(s)
 PY
 if "$COPY_REPO/aigile" harness check >/dev/null 2>&1; then
-    fail "aigile harness check accepted a restrictive Antigravity tools allowlist"
+    fail "aigile harness check accepted an Antigravity orchestrator missing write_file"
 else
-    pass "aigile harness check rejects a restrictive Antigravity tools allowlist"
+    pass "aigile harness check rejects an Antigravity orchestrator missing write_file"
 fi
 cp "$SCRATCH_ROOT/orchestrator.ag.bak" "$NEG_AG"
 
